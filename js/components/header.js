@@ -1,0 +1,53 @@
+// ============================================================
+// HEADER COMPONENT
+// ============================================================
+
+const pageTitles = {
+  dashboard: '首頁 / Dashboard',
+  notifications: '通知中心',
+  profile: '個人資料',
+  projects: '專案管理',
+  tasks: '任務管理',
+  gantt: '進度監控 (甘特圖)',
+  members: '成員管理',
+  reports: '報表',
+  'my-tasks': '我的任務',
+  'task-detail': '任務詳細',
+  'work-progress': '工作進度',
+  calendar: '行事曆',
+  files: '檔案管理',
+  discussion: '討論區 / 留言',
+};
+
+function renderHeader() {
+  const u = AppState.currentUser;
+  const title = pageTitles[AppState.currentPage] || '首頁';
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+
+  document.getElementById('header-container').innerHTML = `
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between" style="height:64px">
+      <div class="flex items-center gap-3">
+        <h1 class="text-lg font-bold text-gray-800">${title}</h1>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="text-sm text-gray-400">${dateStr}</span>
+        <div class="search-input-wrap hidden md:block">
+          ${svgIcon('search', 16, 'search-icon')}
+          <input class="form-input search-input-wrap" style="width:220px;padding-left:36px;height:36px;font-size:13px" placeholder="搜尋專案、任務..." />
+        </div>
+        <button onclick="navigateTo('notifications')" class="btn-icon relative">
+          ${svgIcon('bell', 20)}
+          <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" id="header-notif-dot"></span>
+        </button>
+        <button onclick="navigateTo('profile')" class="flex items-center gap-2 hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors">
+          ${u ? userAvatar(u, 32) : ''}
+          <span class="text-sm font-medium text-gray-700 hidden md:block">${u ? u.name : ''}</span>
+        </button>
+      </div>
+    </header>`;
+
+  const dot = document.getElementById('header-notif-dot');
+  const unread = AppState.notifications.filter(n => !n.read).length;
+  if (dot) dot.style.display = unread > 0 ? 'block' : 'none';
+}

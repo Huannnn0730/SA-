@@ -1,0 +1,225 @@
+// ============================================================
+// TASK MANAGEMENT PAGE (Admin)
+// ============================================================
+
+let taskFilter = { status: 'all', assignee: 'all', search: '' };
+
+function renderTasks() {
+  document.getElementById('page-container').innerHTML = `
+    <div class="page-enter">
+      <div class="card">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="font-bold text-gray-800 text-lg">任務管理</h2>
+          <button onclick="openAddTaskModal()" class="btn btn-primary">${svgIcon('plus', 16)} 新增任務</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-3 mb-4">
+          <select class="form-input form-select" style="width:140px" onchange="taskFilter.status=this.value;refreshTaskTable()">
+            <option value="all">全部狀態</option>
+            <option value="active">進行中</option><option value="done">已完成</option>
+            <option value="pending">未開始</option><option value="paused">暫停中</option>
+          </select>
+          <select class="form-input form-select" style="width:140px" onchange="taskFilter.assignee=this.value;refreshTaskTable()">
+            <option value="all">全部負責人</option>
+            ${AppState.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+          </select>
+          <div class="search-input-wrap flex-1" style="min-width:180px">
+            ${svgIcon('search', 16, 'search-icon')}
+            <input class="form-input" style="padding-left:36px" placeholder="搜尋任務..." oninput="taskFilter.search=this.value;refreshTaskTable()" />
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="data-table">
+            <thead><tr>
+              <th>任務名稱</th><th>所屬專案</th><th>負責人</th><th>優先度</th><th>截止日期</th><th>狀態</th><th>操作</th>
+            </tr></thead>
+            <tbody id="tasks-tbody">${renderTaskRows()}</tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
+function getFilteredTasks() {
+  return AppState.tasks.filter(t => {
+    if (taskFilter.status !== 'all' && t.status !== taskFilter.status) return false;
+    if (taskFilter.assignee !== 'all' && t.assignee !== parseInt(taskFilter.assignee)) return false;
+    if (taskFilter.search && !t.name.includes(taskFilter.search)) return false;
+    return true;
+  });
+}
+
+function renderTaskRows() {
+  const tasks = getFilteredTasks();
+  if (!tasks.length) return `<tr><td colspan="7" class="text-center text-gray-400 py-8">沒有符合條件的任務</td></tr>`;
+  return tasks.map(t => {
+    const proj = AppState.getProject(t.projectId);
+    const user = AppState.getUser(t.assignee);
+    return `<tr>
+      <td class="font-medium">
+        <button onclick="navigateTo('task-detail');AppState.currentTaskId=${t.id}" class="text-left hover:text-blue-600 transition-colors">${t.name}</button>
+      </td>
+      <td class="text-gray-500 text-sm">${proj ? proj.name : '—'}</td>
+      <td>
+        <div class="flex items-center gap-2">
+          ${user ? userAvatar(user, 28) : ''}
+          <span class="text-sm">${user ? user.name : '—'}</span>
+        </div>
+      </td>
+      <td><span class="badge ${AppState.priorityBadge(t.priority)}">${AppState.priorityLabel(t.priority)}</span></td>
+      <td class="text-gray-500 text-sm">${t.dueDate}</td>
+      <td><span class="badge ${AppState.statusBadge(t.status)}">${AppState.statusLabel(t.status)}</span></td>
+      <td>
+        <div class="flex gap-1">
+          <button onclick="openEditTaskModal(${t.id})" class="btn-icon" title="編輯">${svgIcon('edit', 16)}</button>
+          <button onclick="deleteTask(${t.id})" class="btn-icon btn-icon-red" title="刪除">${svgIcon('trash', 16)}</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function refreshTaskTable() {
+  const tbody = document.getElementById('tasks-tbody');
+  if (tbody) tbody.innerHTML = renderTaskRows();
+}
+
+function openAddTaskModal() {
+  openModal(modalShell('新增任務',
+    `<div class="flex flex-col gap-4">
+      <div><label class="form-label">任務名稱</label><input id="tk-name" class="form-input" placeholder="請輸入任務名稱" /></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="form-label">所屬專案</label>
+          <select id="tk-project" class="form-input form-select">
+            ${AppState.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">負責人</label>
+          <select id="tk-assignee" class="form-input form-select">
+            ${AppState.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="form-label">優先度</label>
+          <select id="tk-priority" class="form-input form-select">
+            <option value="high">高</option><option value="mid" selected>中</option><option value="low">低</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">截止日期</label>
+          <input id="tk-due" type="date" class="form-input" />
+        </div>
+      </div>
+      <div>
+        <label class="form-label">任務描述</label>
+        <textarea id="tk-desc" class="form-input" rows="3" placeholder="請描述任務內容..."></textarea>
+      </div>
+    </div>`,
+    `<button onclick="closeModal()" class="btn btn-secondary">取消</button>
+     <button onclick="addTask()" class="btn btn-primary">新增</button>`
+  ));
+}
+
+function addTask() {
+  const name = document.getElementById('tk-name').value.trim();
+  if (!name) { showToast('請輸入任務名稱', 'error'); return; }
+  const dueRaw = document.getElementById('tk-due').value;
+  AppState.tasks.push({
+    id: AppState.tasks.length + 1,
+    name,
+    projectId: parseInt(document.getElementById('tk-project').value),
+    assignee: parseInt(document.getElementById('tk-assignee').value),
+    priority: document.getElementById('tk-priority').value,
+    dueDate: dueRaw ? dueRaw.replace(/-/g, '/') : '—',
+    status: 'pending',
+    progress: 0,
+    desc: document.getElementById('tk-desc').value,
+    comments: [], attachments: [],
+  });
+  closeModal();
+  refreshTaskTable();
+  showToast('任務已新增', 'success');
+}
+
+function openEditTaskModal(id) {
+  const t = AppState.tasks.find(t => t.id === id);
+  if (!t) return;
+  openModal(modalShell('編輯任務',
+    `<div class="flex flex-col gap-4">
+      <div><label class="form-label">任務名稱</label><input id="etk-name" class="form-input" value="${t.name}" /></div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="form-label">所屬專案</label>
+          <select id="etk-project" class="form-input form-select">
+            ${AppState.projects.map(p => `<option value="${p.id}" ${t.projectId===p.id?'selected':''}>${p.name}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">負責人</label>
+          <select id="etk-assignee" class="form-input form-select">
+            ${AppState.members.map(m => `<option value="${m.id}" ${t.assignee===m.id?'selected':''}>${m.name}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-3">
+        <div>
+          <label class="form-label">優先度</label>
+          <select id="etk-priority" class="form-input form-select">
+            ${['high','mid','low'].map(v => `<option value="${v}" ${t.priority===v?'selected':''}>${AppState.priorityLabel(v)}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">狀態</label>
+          <select id="etk-status" class="form-input form-select">
+            ${['pending','active','done','paused'].map(v => `<option value="${v}" ${t.status===v?'selected':''}>${AppState.statusLabel(v)}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="form-label">截止日期</label>
+          <input id="etk-due" type="date" class="form-input" value="${t.dueDate.replace(/\//g,'-')}" />
+        </div>
+      </div>
+      <div>
+        <label class="form-label">進度 (${t.progress}%)</label>
+        <input id="etk-progress" type="range" min="0" max="100" value="${t.progress}" class="w-full mt-2" />
+      </div>
+      <div>
+        <label class="form-label">任務描述</label>
+        <textarea id="etk-desc" class="form-input" rows="3">${t.desc || ''}</textarea>
+      </div>
+    </div>`,
+    `<button onclick="closeModal()" class="btn btn-secondary">取消</button>
+     <button onclick="saveTask(${id})" class="btn btn-primary">儲存</button>`
+  ));
+}
+
+function saveTask(id) {
+  const t = AppState.tasks.find(t => t.id === id);
+  if (!t) return;
+  t.name = document.getElementById('etk-name').value.trim() || t.name;
+  t.projectId = parseInt(document.getElementById('etk-project').value);
+  t.assignee = parseInt(document.getElementById('etk-assignee').value);
+  t.priority = document.getElementById('etk-priority').value;
+  t.status = document.getElementById('etk-status').value;
+  const due = document.getElementById('etk-due').value;
+  if (due) t.dueDate = due.replace(/-/g, '/');
+  t.progress = parseInt(document.getElementById('etk-progress').value);
+  t.desc = document.getElementById('etk-desc').value;
+  closeModal();
+  refreshTaskTable();
+  showToast('任務已更新', 'success');
+}
+
+function deleteTask(id) {
+  confirmModal('刪除任務', '確定要刪除此任務嗎？', () => {
+    AppState.tasks = AppState.tasks.filter(t => t.id !== id);
+    refreshTaskTable();
+    showToast('任務已刪除', 'success');
+  });
+}
