@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "PowerShell(& \"C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\node.exe\" --version 2>&1)",
-      "PowerShell(& \"C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\npm.cmd\" --version 2>&1)"
+      "PowerShell(& \"C:\\\\Program Files\\\\Git\\\\mingw64\\\\bin\\\\npm.cmd\" --version 2>&1)",
+      "Read(//c/Users/user/OneDrive/文件/**)",
+      "Bash(python -c ' *)",
+      "Bash(pip install *)",
+      "Bash(python -c \"import sys; data=sys.stdin.buffer.read\\(\\); print\\(data.decode\\('utf-8','replace'\\)\\)\")",
+      "Bash(python -m http.server 3030)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3030/)"
     ]
   }
 }

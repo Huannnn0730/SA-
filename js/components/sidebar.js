@@ -20,7 +20,9 @@ function renderSidebar() {
   `;
 
   const html = `
-    <div class="h-full bg-white border-r border-gray-200 flex flex-col" style="width:240px">
+    <!-- Mobile overlay backdrop -->
+    <div id="sidebar-backdrop" onclick="closeSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:40"></div>
+    <div id="sidebar-panel" class="h-full bg-white border-r border-gray-200 flex flex-col sidebar-panel" style="width:240px">
       <!-- Logo -->
       <div class="p-5 border-b border-gray-100">
         <div class="flex items-center gap-3">
@@ -51,13 +53,14 @@ function renderSidebar() {
       <!-- User footer -->
       <div class="p-4 border-t border-gray-100">
         <div class="flex items-center gap-3">
-          ${u ? userAvatar(u, 36) : ''}
-          <div class="flex-1 min-w-0">
-            <div class="text-sm font-semibold text-gray-800 truncate">${u ? u.name : ''}</div>
-            <div class="text-xs text-gray-400 truncate">${u ? AppState.roleLabel(u.role) : ''}</div>
-          </div>
-          <button onclick="navigateTo('profile')" class="btn-icon" title="個人資料">${svgIcon('user', 16)}</button>
-          <button onclick="logout()" class="btn-icon btn-icon-red" title="登出">${svgIcon('logout', 16)}</button>
+          <button onclick="navigateTo('profile');closeSidebar()" class="flex items-center gap-3 flex-1 min-w-0 hover:bg-gray-50 rounded-xl p-1 -m-1 transition-colors text-left">
+            ${u ? userAvatar(u, 36) : ''}
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-semibold text-gray-800 truncate">${u ? u.name : ''}</div>
+              <div class="text-xs text-gray-400 truncate">${u ? AppState.roleLabel(u.role) : ''}</div>
+            </div>
+          </button>
+          <button onclick="logout()" class="btn-icon btn-icon-red flex-shrink-0" title="登出">${svgIcon('logout', 16)}</button>
         </div>
       </div>
     </div>`;
@@ -68,8 +71,32 @@ function renderSidebar() {
 
   // nav click
   document.querySelectorAll('.sidebar-nav-item[data-page]').forEach(el => {
-    el.addEventListener('click', () => navigateTo(el.dataset.page));
+    el.addEventListener('click', () => { navigateTo(el.dataset.page); closeSidebar(); });
   });
+}
+
+function toggleSidebar() {
+  const panel = document.getElementById('sidebar-panel');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (!panel) return;
+  const isOpen = panel.classList.contains('sidebar-open');
+  if (isOpen) { closeSidebar(); } else { openSidebar(); }
+}
+
+function openSidebar() {
+  const panel = document.getElementById('sidebar-panel');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (!panel) return;
+  panel.classList.add('sidebar-open');
+  if (backdrop) backdrop.style.display = 'block';
+}
+
+function closeSidebar() {
+  const panel = document.getElementById('sidebar-panel');
+  const backdrop = document.getElementById('sidebar-backdrop');
+  if (!panel) return;
+  panel.classList.remove('sidebar-open');
+  if (backdrop) backdrop.style.display = 'none';
 }
 
 function updateSidebarActive() {

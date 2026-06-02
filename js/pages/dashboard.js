@@ -24,11 +24,6 @@ function renderDashboard() {
     { label: '未開始', value: AppState.tasks.filter(t => t.status === 'pending').length, color: '#94a3b8' },
   ];
 
-  // Line chart data (mock trend)
-  const trendPoints = [
-    {y:12},{y:18},{y:14},{y:22},{y:20},{y:28},{y:25},{y:30},{y:27},{y:35},{y:32},{y:40}
-  ];
-
   const todayTasks = AppState.tasks.filter(t => t.assignee === u.id && t.status === 'active').slice(0, 3);
   const upcomingTasks = AppState.tasks.filter(t => t.status !== 'done').slice(0, 4);
 
@@ -43,46 +38,34 @@ function renderDashboard() {
         ${statCard('逾期任務', overdueTasks, '#fee2e2', '#b91c1c', 'clock', '↑2', false)}
       </div>
 
-      <!-- Charts row -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <!-- Project progress -->
-        <div class="card">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-gray-800">專案進度總覽</h3>
-            <span class="text-xs text-gray-400">共 ${projTotal} 個專案</span>
-          </div>
-          <div class="flex items-center gap-6">
-            ${donutChart([
-              { label:'進行中', value: activeP, color: '#3b82f6' },
-              { label:'已完成', value: doneP, color: '#22c55e' },
-              { label:'暫停中', value: pausedP, color: '#f59e0b' },
-              { label:'未開始', value: pendingP, color: '#94a3b8' },
-            ], projTotal, projTotal, '個專案', 140)}
-            <div class="flex flex-col gap-2 flex-1">
-              ${[['進行中', activeP, '#3b82f6'], ['已完成', doneP, '#22c55e'], ['暫停中', pausedP, '#f59e0b'], ['未開始', pendingP, '#94a3b8']].map(([l, v, c]) => `
-                <div class="flex items-center justify-between text-sm">
-                  <div class="flex items-center gap-2">
-                    <span style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block"></span>
-                    <span class="text-gray-600">${l}</span>
-                  </div>
-                  <span class="font-semibold text-gray-800">${v}</span>
-                </div>`).join('')}
-            </div>
-          </div>
+      <!-- Charts row — single donut card full width -->
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-gray-800">專案進度總覽</h3>
+          <span class="text-xs text-gray-400">共 ${projTotal} 個專案</span>
         </div>
-
-        <!-- Task trend -->
-        <div class="card">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-gray-800">任務進度趨勢</h3>
-            <span class="badge badge-blue text-xs">近12週</span>
-          </div>
-          ${lineChartSvg(trendPoints, 340, 120, '#3b82f6')}
-          <div class="flex justify-between text-xs text-gray-400 mt-1 px-2">
-            <span>5/17</span><span>5/24</span><span>5/31</span><span>6/7</span><span>6/14</span><span>6/21</span>
+        <div class="flex flex-wrap items-center gap-8">
+          ${donutChart([
+            { label:'進行中', value: activeP, color: '#3b82f6' },
+            { label:'已完成', value: doneP, color: '#22c55e' },
+            { label:'暫停中', value: pausedP, color: '#f59e0b' },
+            { label:'未開始', value: pendingP, color: '#94a3b8' },
+          ], projTotal, projTotal, '個專案', 140)}
+          <div class="flex flex-col gap-3 flex-1" style="min-width:160px">
+            ${[['進行中', activeP, '#3b82f6'], ['已完成', doneP, '#22c55e'], ['暫停中', pausedP, '#f59e0b'], ['未開始', pendingP, '#94a3b8']].map(([l, v, c]) => `
+              <div class="flex items-center justify-between text-sm">
+                <div class="flex items-center gap-2">
+                  <span style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block"></span>
+                  <span class="text-gray-600">${l}</span>
+                </div>
+                <span class="font-semibold text-gray-800">${v}</span>
+              </div>`).join('')}
           </div>
         </div>
       </div>
+
+      <!-- UC31 Risk Alert Panel -->
+      ${renderRiskPanel()}
 
       <!-- Today tasks + Upcoming -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -127,6 +110,49 @@ function renderDashboard() {
         </div>
       </div>
 
+    </div>`;
+}
+
+function renderRiskPanel() {
+  const risks = getRiskTasks();
+  if (!risks.length) {
+    return `<div class="card flex items-center gap-3" style="background:#f0fdf4;border:1.5px solid #bbf7d0">
+      <span style="font-size:22px">✅</span>
+      <div>
+        <div class="font-semibold text-sm" style="color:#15803d">自動化風險監控：目前無高風險任務</div>
+        <div class="text-xs" style="color:#16a34a">所有任務進度正常，繼續保持！</div>
+      </div>
+    </div>`;
+  }
+  const high = risks.filter(r => r.riskLevel === 'high');
+  const mid  = risks.filter(r => r.riskLevel === 'mid');
+  return `
+    <div class="card" style="border:1.5px solid #fecaca;background:#fff5f5">
+      <div class="flex items-center gap-2 mb-3">
+        <span style="font-size:20px">🔴</span>
+        <h3 class="font-bold text-gray-800">自動化風險監控</h3>
+        <span class="ml-auto text-xs px-2 py-1 rounded-full font-semibold" style="background:#fee2e2;color:#b91c1c">${risks.length} 個任務需注意</span>
+      </div>
+      <div class="flex flex-col gap-2">
+        ${risks.map(r => {
+          const assignee = AppState.getUser(r.assignee);
+          const isHigh = r.riskLevel === 'high';
+          return `
+            <div class="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                 style="background:${isHigh?'#fef2f2':'#fffbeb'};border:1px solid ${isHigh?'#fca5a5':'#fde68a'}"
+                 onclick="navigateTo('task-detail');AppState.currentTaskId=${r.id}">
+              <span style="font-size:18px">${isHigh?'🔴':'🟡'}</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-semibold text-gray-800">${r.name}</div>
+                <div class="text-xs" style="color:${isHigh?'#b91c1c':'#92400e'}">${r.riskReason}</div>
+              </div>
+              <div class="text-right flex-shrink-0">
+                ${assignee ? `<div class="flex items-center gap-1 justify-end">${userAvatar(assignee,22)}<span class="text-xs text-gray-500">${assignee.name}</span></div>` : ''}
+                <div class="text-xs mt-1 font-semibold" style="color:${isHigh?'#ef4444':'#f59e0b'}">${r.daysLeft < 0 ? '已逾期' : `剩 ${r.daysLeft} 天`}</div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
     </div>`;
 }
 

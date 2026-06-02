@@ -143,9 +143,25 @@ body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
 .step-line.done { background: #22c55e; }
 
 /* Responsive fix */
+.sidebar-panel { transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); }
+
 @media (max-width: 768px) {
-  #sidebar-container { width: 0; overflow: hidden; }
+  #sidebar-container { width: 0 !important; position: relative; }
+  .sidebar-panel {
+    position: fixed !important;
+    left: 0; top: 0; bottom: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+  }
+  .sidebar-panel.sidebar-open { transform: translateX(0); }
   .modal-box { min-width: 320px; }
+}
+
+@media (min-width: 769px) {
+  #hamburger-btn { display: none !important; }
+  #sidebar-backdrop { display: none !important; }
+  .sidebar-panel { transform: none !important; position: relative !important; }
 }
 
 /* Animations */

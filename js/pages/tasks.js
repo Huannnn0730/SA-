@@ -3,6 +3,7 @@
 // ============================================================
 
 let taskFilter = { status: 'all', assignee: 'all', search: '' };
+let taskView = 'list'; // 'list' | 'kanban'
 
 function renderTasks() {
   document.getElementById('page-container').innerHTML = `
@@ -10,37 +11,57 @@ function renderTasks() {
       <div class="card">
         <div class="flex items-center justify-between mb-6">
           <h2 class="font-bold text-gray-800 text-lg">任務管理</h2>
-          <button onclick="openAddTaskModal()" class="btn btn-primary">${svgIcon('plus', 16)} 新增任務</button>
+          <div class="flex items-center gap-2">
+            <!-- View Toggle -->
+            <div class="flex rounded-lg border border-gray-200 overflow-hidden">
+              <button id="view-list" onclick="switchTaskView('list')"
+                class="px-3 py-1.5 text-sm flex items-center gap-1 transition-colors ${taskView==='list'?'bg-blue-600 text-white':'bg-white text-gray-500 hover:bg-gray-50'}">
+                ${svgIcon('list', 15)} 列表
+              </button>
+              <button id="view-kanban" onclick="switchTaskView('kanban')"
+                class="px-3 py-1.5 text-sm flex items-center gap-1 transition-colors border-l border-gray-200 ${taskView==='kanban'?'bg-blue-600 text-white':'bg-white text-gray-500 hover:bg-gray-50'}">
+                ${svgIcon('layout', 15)} 看板
+              </button>
+            </div>
+            <button onclick="openAddTaskModal()" class="btn btn-primary">${svgIcon('plus', 16)} 新增任務</button>
+          </div>
         </div>
 
         <!-- Filters -->
         <div class="flex flex-wrap gap-3 mb-4">
-          <select class="form-input form-select" style="width:140px" onchange="taskFilter.status=this.value;refreshTaskTable()">
+          <select class="form-input form-select" style="width:140px" onchange="taskFilter.status=this.value;refreshTaskView()">
             <option value="all">全部狀態</option>
             <option value="active">進行中</option><option value="done">已完成</option>
             <option value="pending">未開始</option><option value="paused">暫停中</option>
           </select>
-          <select class="form-input form-select" style="width:140px" onchange="taskFilter.assignee=this.value;refreshTaskTable()">
+          <select class="form-input form-select" style="width:140px" onchange="taskFilter.assignee=this.value;refreshTaskView()">
             <option value="all">全部負責人</option>
             ${AppState.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
           </select>
           <div class="search-input-wrap flex-1" style="min-width:180px">
             ${svgIcon('search', 16, 'search-icon')}
-            <input class="form-input" style="padding-left:36px" placeholder="搜尋任務..." oninput="taskFilter.search=this.value;refreshTaskTable()" />
+            <input class="form-input" style="padding-left:36px" placeholder="搜尋任務..." oninput="taskFilter.search=this.value;refreshTaskView()" />
           </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="data-table">
-            <thead><tr>
-              <th>任務名稱</th><th>所屬專案</th><th>負責人</th><th>優先度</th><th>截止日期</th><th>狀態</th><th>操作</th>
-            </tr></thead>
-            <tbody id="tasks-tbody">${renderTaskRows()}</tbody>
-          </table>
+        <div id="task-view-container">
+          ${taskView === 'list' ? renderListView() : renderKanbanView()}
         </div>
       </div>
     </div>`;
 }
+
+function switchTaskView(view) {
+  taskView = view;
+  renderTasks();
+}
+
+function refreshTaskView() {
+  const container = document.getElementById('task-view-container');
+  if (container) container.innerHTML = taskView === 'list' ? renderListView() : renderKanbanView();
+}
+
+// ── List View ──────────────────────────────────────────────
 
 function getFilteredTasks() {
   return AppState.tasks.filter(t => {
@@ -49,6 +70,18 @@ function getFilteredTasks() {
     if (taskFilter.search && !t.name.includes(taskFilter.search)) return false;
     return true;
   });
+}
+
+function renderListView() {
+  return `
+    <div class="overflow-x-auto">
+      <table class="data-table">
+        <thead><tr>
+          <th>任務名稱</th><th>所屬專案</th><th>負責人</th><th>優先度</th><th>截止日期</th><th>狀態</th><th>操作</th>
+        </tr></thead>
+        <tbody id="tasks-tbody">${renderTaskRows()}</tbody>
+      </table>
+    </div>`;
 }
 
 function renderTaskRows() {
@@ -86,7 +119,92 @@ function refreshTaskTable() {
   if (tbody) tbody.innerHTML = renderTaskRows();
 }
 
+// ── Kanban View ────────────────────────────────────────────
+
+const KANBAN_COLS = [
+  { key: 'pending', label: '未開始', color: '#94a3b8', bg: '#f8fafc', dot: '#94a3b8' },
+  { key: 'active',  label: '進行中', color: '#3b82f6', bg: '#eff6ff', dot: '#3b82f6' },
+  { key: 'paused',  label: '暫停中', color: '#f59e0b', bg: '#fffbeb', dot: '#f59e0b' },
+  { key: 'done',    label: '已完成', color: '#22c55e', bg: '#f0fdf4', dot: '#22c55e' },
+];
+
+function renderKanbanView() {
+  const tasks = getFilteredTasks();
+  const cols = KANBAN_COLS.map(col => {
+    const colTasks = tasks.filter(t => t.status === col.key);
+    return `
+      <div class="kanban-col" style="flex:1;min-width:220px;background:${col.bg};border-radius:12px;padding:12px;"
+           ondragover="event.preventDefault()" ondrop="kanbanDrop(event,'${col.key}')">
+        <div class="flex items-center gap-2 mb-3">
+          <span style="width:10px;height:10px;border-radius:50%;background:${col.dot};display:inline-block"></span>
+          <span class="font-semibold text-sm" style="color:${col.color}">${col.label}</span>
+          <span class="ml-auto text-xs text-gray-400 font-medium bg-white rounded-full px-2 py-0.5 border">${colTasks.length}</span>
+        </div>
+        <div class="flex flex-col gap-2 kanban-drop-zone" id="kanban-col-${col.key}" style="min-height:60px">
+          ${colTasks.map(t => renderKanbanCard(t)).join('')}
+        </div>
+      </div>`;
+  }).join('');
+
+  return `<div class="flex gap-3 overflow-x-auto pb-2" style="align-items:flex-start">${cols}</div>`;
+}
+
+function renderKanbanCard(t) {
+  const user = AppState.getUser(t.assignee);
+  const proj = AppState.getProject(t.projectId);
+  const moodMap = { '😊': '順利', '😟': '困難', '😤': '壓力大', '🔥': '全力衝刺' };
+  const moodHtml = t.mood ? `<span title="${moodMap[t.mood]||''}" style="font-size:16px">${t.mood}</span>` : '';
+  return `
+    <div class="kanban-card" draggable="true"
+         ondragstart="kanbanDragStart(event,${t.id})"
+         style="background:white;border-radius:8px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08);cursor:grab;border:1.5px solid #f1f5f9;transition:box-shadow 0.15s">
+      <div class="flex items-start justify-between gap-2 mb-2">
+        <button onclick="navigateTo('task-detail');AppState.currentTaskId=${t.id}"
+          class="text-sm font-medium text-gray-800 text-left hover:text-blue-600 transition-colors leading-snug">${t.name}</button>
+        ${moodHtml}
+      </div>
+      <div class="text-xs text-gray-400 mb-2">${proj ? proj.name : ''}</div>
+      ${progressBar(t.progress, 'progress-blue', 5)}
+      <div class="flex items-center justify-between mt-2">
+        <div class="flex items-center gap-1">
+          ${user ? userAvatar(user, 22) : ''}
+          <span class="text-xs text-gray-400">${user ? user.name : ''}</span>
+        </div>
+        <span class="badge ${AppState.priorityBadge(t.priority)}" style="font-size:10px;padding:1px 6px">${AppState.priorityLabel(t.priority)}</span>
+      </div>
+    </div>`;
+}
+
+let _draggingTaskId = null;
+
+function kanbanDragStart(event, taskId) {
+  _draggingTaskId = taskId;
+  event.dataTransfer.effectAllowed = 'move';
+}
+
+function kanbanDrop(event, newStatus) {
+  event.preventDefault();
+  if (!_draggingTaskId) return;
+  const t = AppState.tasks.find(t => t.id === _draggingTaskId);
+  if (t && t.status !== newStatus) {
+    t.status = newStatus;
+    if (newStatus === 'done' && t.progress < 100) t.progress = 100;
+    if (newStatus === 'active' && t.progress === 0) t.progress = 5;
+    if (newStatus === 'pending') t.progress = 0;
+    showToast(`任務已移至「${AppState.statusLabel(newStatus)}」`, 'success');
+    checkRiskAlerts();
+  }
+  _draggingTaskId = null;
+  refreshTaskView();
+}
+
+// ── Add / Edit / Delete (shared) ───────────────────────────
+
+let _addTaskForProject = null;
+
 function openAddTaskModal() {
+  const preId = _addTaskForProject;
+  _addTaskForProject = null;
   openModal(modalShell('新增任務',
     `<div class="flex flex-col gap-4">
       <div><label class="form-label">任務名稱</label><input id="tk-name" class="form-input" placeholder="請輸入任務名稱" /></div>
@@ -94,7 +212,7 @@ function openAddTaskModal() {
         <div>
           <label class="form-label">所屬專案</label>
           <select id="tk-project" class="form-input form-select">
-            ${AppState.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+            ${AppState.projects.map(p => `<option value="${p.id}" ${preId && p.id === preId ? 'selected' : ''}>${p.name}</option>`).join('')}
           </select>
         </div>
         <div>
@@ -141,15 +259,18 @@ function addTask() {
     progress: 0,
     desc: document.getElementById('tk-desc').value,
     comments: [], attachments: [],
+    dependencies: [],
+    mood: null,
   });
   closeModal();
-  refreshTaskTable();
+  refreshTaskView();
   showToast('任務已新增', 'success');
 }
 
 function openEditTaskModal(id) {
   const t = AppState.tasks.find(t => t.id === id);
   if (!t) return;
+  const otherTasks = AppState.tasks.filter(tk => tk.id !== id);
   openModal(modalShell('編輯任務',
     `<div class="flex flex-col gap-4">
       <div><label class="form-label">任務名稱</label><input id="etk-name" class="form-input" value="${t.name}" /></div>
@@ -186,8 +307,16 @@ function openEditTaskModal(id) {
         </div>
       </div>
       <div>
-        <label class="form-label">進度 (${t.progress}%)</label>
-        <input id="etk-progress" type="range" min="0" max="100" value="${t.progress}" class="w-full mt-2" />
+        <label class="form-label">進度 (<span id="etk-pval">${t.progress}</span>%)</label>
+        <input id="etk-progress" type="range" min="0" max="100" value="${t.progress}" class="w-full mt-2"
+               oninput="document.getElementById('etk-pval').textContent=this.value" />
+      </div>
+      <div>
+        <label class="form-label">前置任務（依賴關係）</label>
+        <select id="etk-deps" class="form-input form-select" multiple style="height:80px">
+          ${otherTasks.map(tk => `<option value="${tk.id}" ${(t.dependencies||[]).includes(tk.id)?'selected':''}>${tk.name}</option>`).join('')}
+        </select>
+        <p class="text-xs text-gray-400 mt-1">可多選，此任務需等所選任務完成後才能開始</p>
       </div>
       <div>
         <label class="form-label">任務描述</label>
@@ -211,15 +340,21 @@ function saveTask(id) {
   if (due) t.dueDate = due.replace(/-/g, '/');
   t.progress = parseInt(document.getElementById('etk-progress').value);
   t.desc = document.getElementById('etk-desc').value;
+
+  // Save dependencies (multi-select)
+  const depsEl = document.getElementById('etk-deps');
+  t.dependencies = depsEl ? Array.from(depsEl.selectedOptions).map(o => parseInt(o.value)) : [];
+
   closeModal();
-  refreshTaskTable();
+  refreshTaskView();
+  checkRiskAlerts();
   showToast('任務已更新', 'success');
 }
 
 function deleteTask(id) {
   confirmModal('刪除任務', '確定要刪除此任務嗎？', () => {
     AppState.tasks = AppState.tasks.filter(t => t.id !== id);
-    refreshTaskTable();
+    refreshTaskView();
     showToast('任務已刪除', 'success');
   });
 }

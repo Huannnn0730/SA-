@@ -13,11 +13,14 @@ function modalShell(title, body, footer = '') {
   </div>`;
 }
 
+let _pendingConfirm = null;
+
 function confirmModal(title, message, onConfirm) {
+  _pendingConfirm = onConfirm;
   openModal(modalShell(
     title,
     `<p class="text-gray-600 text-sm">${message}</p>`,
     `<button onclick="closeModal()" class="btn btn-secondary">取消</button>
-     <button onclick="(${onConfirm})();closeModal();" class="btn btn-primary">確認</button>`
+     <button onclick="if(_pendingConfirm){_pendingConfirm();_pendingConfirm=null;}closeModal();" class="btn btn-primary">確認</button>`
   ));
 }

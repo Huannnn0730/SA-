@@ -24,16 +24,16 @@ const AppState = {
   ],
 
   tasks: [
-    { id: 1,  projectId: 1, name: '需求文件撰寫',   assignee: 1, priority: 'high', dueDate: '2024/05/15', status: 'done',    progress: 100, desc: '撰寫會員系統的完整需求規格書，包含功能需求、非功能需求與介面設計規範。', comments: [], attachments: ['需求文件.pdf'] },
-    { id: 2,  projectId: 1, name: '設計稿確認',     assignee: 2, priority: 'high', dueDate: '2024/05/20', status: 'active',  progress: 70,  desc: '確認所有頁面的設計稿，包含桌面版與手機版，並提交給開發團隊。', comments: [], attachments: ['設計稿.zip'] },
-    { id: 3,  projectId: 1, name: '前端開發',       assignee: 3, priority: 'mid',  dueDate: '2024/06/10', status: 'active',  progress: 45,  desc: '根據設計稿實作前端介面，使用 React + TypeScript 技術棧。', comments: [], attachments: [] },
-    { id: 4,  projectId: 1, name: '後端 API 開發',  assignee: 4, priority: 'high', dueDate: '2024/06/15', status: 'active',  progress: 40,  desc: '開發 RESTful API，包含用戶管理、專案管理、任務管理等模組。', comments: [], attachments: [] },
-    { id: 5,  projectId: 1, name: '測試與修正',     assignee: 5, priority: 'mid',  dueDate: '2024/07/20', status: 'pending', progress: 0,   desc: '執行功能測試、壓力測試與安全性測試，並修復發現的問題。', comments: [], attachments: [] },
-    { id: 6,  projectId: 2, name: '行銷素材製作',   assignee: 2, priority: 'mid',  dueDate: '2024/05/25', status: 'done',    progress: 100, desc: '製作社群媒體廣告素材、EDM 模板與活動頁面設計。', comments: [], attachments: [] },
-    { id: 7,  projectId: 2, name: '活動頁面開發',   assignee: 3, priority: 'high', dueDate: '2024/06/05', status: 'active',  progress: 55,  desc: '開發活動登陸頁面，串接報名系統與 Google Analytics。', comments: [], attachments: [] },
-    { id: 8,  projectId: 3, name: '系統架構規劃',   assignee: 1, priority: 'high', dueDate: '2024/03/20', status: 'done',    progress: 100, desc: '規劃整體系統架構，包含資料庫設計、API 設計與部署方案。', comments: [], attachments: [] },
-    { id: 9,  projectId: 4, name: '品牌識別設計',   assignee: 2, priority: 'low',  dueDate: '2024/05/10', status: 'paused',  progress: 30,  desc: '設計新品牌識別系統，包含 Logo、色彩規範與字體使用準則。', comments: [], attachments: [] },
-    { id: 10, projectId: 5, name: 'APP 需求分析',   assignee: 1, priority: 'mid',  dueDate: '2024/06/15', status: 'pending', progress: 0,   desc: '收集並分析 APP 功能需求，產出需求規格書。', comments: [], attachments: [] },
+    { id: 1,  projectId: 1, name: '需求文件撰寫',   assignee: 1, priority: 'high', dueDate: '2026/06/03', status: 'active',  progress: 20,  desc: '撰寫會員系統的完整需求規格書，包含功能需求、非功能需求與介面設計規範。', comments: [], attachments: ['需求文件.pdf'], dependencies: [], mood: null },
+    { id: 2,  projectId: 1, name: '設計稿確認',     assignee: 2, priority: 'high', dueDate: '2026/06/04', status: 'active',  progress: 15,  desc: '確認所有頁面的設計稿，包含桌面版與手機版，並提交給開發團隊。', comments: [], attachments: ['設計稿.zip'], dependencies: [1], mood: '😟' },
+    { id: 3,  projectId: 1, name: '前端開發',       assignee: 3, priority: 'mid',  dueDate: '2026/06/10', status: 'active',  progress: 45,  desc: '根據設計稿實作前端介面，使用 React + TypeScript 技術棧。', comments: [], attachments: [], dependencies: [2], mood: '🔥' },
+    { id: 4,  projectId: 1, name: '後端 API 開發',  assignee: 4, priority: 'high', dueDate: '2026/06/15', status: 'active',  progress: 40,  desc: '開發 RESTful API，包含用戶管理、專案管理、任務管理等模組。', comments: [], attachments: [], dependencies: [], mood: '😊' },
+    { id: 5,  projectId: 1, name: '測試與修正',     assignee: 5, priority: 'mid',  dueDate: '2026/07/20', status: 'pending', progress: 0,   desc: '執行功能測試、壓力測試與安全性測試，並修復發現的問題。', comments: [], attachments: [], dependencies: [3, 4], mood: null },
+    { id: 6,  projectId: 2, name: '行銷素材製作',   assignee: 2, priority: 'mid',  dueDate: '2026/05/25', status: 'done',    progress: 100, desc: '製作社群媒體廣告素材、EDM 模板與活動頁面設計。', comments: [], attachments: [], dependencies: [], mood: '😊' },
+    { id: 7,  projectId: 2, name: '活動頁面開發',   assignee: 3, priority: 'high', dueDate: '2026/06/05', status: 'active',  progress: 55,  desc: '開發活動登陸頁面，串接報名系統與 Google Analytics。', comments: [], attachments: [], dependencies: [6], mood: null },
+    { id: 8,  projectId: 3, name: '系統架構規劃',   assignee: 1, priority: 'high', dueDate: '2026/03/20', status: 'done',    progress: 100, desc: '規劃整體系統架構，包含資料庫設計、API 設計與部署方案。', comments: [], attachments: [], dependencies: [], mood: null },
+    { id: 9,  projectId: 4, name: '品牌識別設計',   assignee: 2, priority: 'low',  dueDate: '2026/05/10', status: 'paused',  progress: 30,  desc: '設計新品牌識別系統，包含 Logo、色彩規範與字體使用準則。', comments: [], attachments: [], dependencies: [], mood: null },
+    { id: 10, projectId: 5, name: 'APP 需求分析',   assignee: 1, priority: 'mid',  dueDate: '2026/06/15', status: 'pending', progress: 0,   desc: '收集並分析 APP 功能需求，產出需求規格書。', comments: [], attachments: [], dependencies: [], mood: null },
   ],
 
   notifications: [

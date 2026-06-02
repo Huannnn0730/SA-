@@ -32,7 +32,9 @@ function renderProjects() {
 function renderProjectRows() {
   return AppState.projects.map(p => `
     <tr>
-      <td class="font-medium">${p.name}</td>
+      <td class="font-medium">
+        <button onclick="openProjectDetail(${p.id})" class="text-left text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors">${p.name}</button>
+      </td>
       <td><span class="badge ${AppState.statusBadge(p.status)}">${AppState.statusLabel(p.status)}</span></td>
       <td class="text-gray-500">${p.startDate}</td>
       <td class="text-gray-500">${p.endDate}</td>
@@ -136,4 +138,63 @@ function deleteProject(id) {
     document.getElementById('projects-tbody').innerHTML = renderProjectRows();
     showToast('專案已刪除', 'success');
   });
+}
+
+function openProjectDetail(id) {
+  const p = AppState.getProject(id);
+  if (!p) return;
+  const tasks = AppState.getTasksByProject(id);
+  const done   = tasks.filter(t => t.status === 'done').length;
+  const active = tasks.filter(t => t.status === 'active').length;
+
+  const taskRows = tasks.length === 0
+    ? `<tr><td colspan="5" class="text-center text-gray-400 py-6">此專案尚無任務</td></tr>`
+    : tasks.map(t => {
+        const assignee = AppState.getUser(t.assignee);
+        return `<tr>
+          <td class="font-medium text-sm">
+            <button onclick="closeModal();AppState.currentTaskId=${t.id};navigateTo('task-detail')"
+              class="text-blue-600 hover:underline text-left">${t.name}</button>
+          </td>
+          <td><span class="badge ${AppState.priorityBadge(t.priority)}">${AppState.priorityLabel(t.priority)}</span></td>
+          <td>
+            <div class="flex items-center gap-2" style="min-width:100px">
+              ${assignee ? userAvatar(assignee, 24) : ''}
+              <span class="text-sm text-gray-600">${assignee ? assignee.name : '—'}</span>
+            </div>
+          </td>
+          <td class="text-gray-500 text-sm">${t.dueDate}</td>
+          <td><span class="badge ${AppState.statusBadge(t.status)}">${AppState.statusLabel(t.status)}</span></td>
+        </tr>`;
+      }).join('');
+
+  openModal(modalShell(
+    `${p.name}`,
+    `<!-- Project summary -->
+    <div class="flex flex-wrap gap-3 mb-5">
+      <span class="badge ${AppState.statusBadge(p.status)}">${AppState.statusLabel(p.status)}</span>
+      <span class="text-xs text-gray-400">${p.startDate} ～ ${p.endDate}</span>
+    </div>
+    <div class="flex items-center gap-2 mb-5">
+      <div class="flex-1">${progressBar(p.progress, p.progress >= 100 ? 'progress-green' : p.progress >= 50 ? 'progress-blue' : 'progress-orange', 10)}</div>
+      <span class="text-sm font-bold text-gray-700">${p.progress}%</span>
+    </div>
+    <div class="flex gap-4 text-sm text-gray-500 mb-5">
+      <span>共 <strong class="text-gray-800">${tasks.length}</strong> 個任務</span>
+      <span>已完成 <strong class="text-green-600">${done}</strong></span>
+      <span>進行中 <strong class="text-blue-600">${active}</strong></span>
+    </div>
+
+    <!-- Tasks table -->
+    <div class="overflow-x-auto">
+      <table class="data-table">
+        <thead><tr>
+          <th>任務名稱</th><th>優先度</th><th>負責人</th><th>截止日期</th><th>狀態</th>
+        </tr></thead>
+        <tbody>${taskRows}</tbody>
+      </table>
+    </div>`,
+    `<button onclick="closeModal()" class="btn btn-secondary">關閉</button>
+     <button onclick="closeModal();_addTaskForProject=${id};navigateTo('tasks');setTimeout(openAddTaskModal,50)" class="btn btn-primary">${svgIcon('plus',14)} 新增任務</button>`
+  ));
 }

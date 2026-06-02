@@ -2,6 +2,13 @@
 // TASK DETAIL PAGE
 // ============================================================
 
+const MOOD_OPTIONS = [
+  { emoji: '😊', label: '順利',    color: '#22c55e' },
+  { emoji: '🔥', label: '全力衝刺', color: '#f97316' },
+  { emoji: '😟', label: '遇到困難', color: '#f59e0b' },
+  { emoji: '😤', label: '壓力大',  color: '#ef4444' },
+];
+
 function renderTaskDetail() {
   const t = AppState.tasks.find(t => t.id === AppState.currentTaskId);
   if (!t) {
@@ -14,9 +21,13 @@ function renderTaskDetail() {
   const u = AppState.currentUser;
   const isAdmin = u.role === 'admin';
   const discussions = AppState.getDiscussionsByTask(t.id);
-
+  const isAssignee = t.assignee === u.id;
   const prevPage = isAdmin ? 'tasks' : 'my-tasks';
   const prevLabel = isAdmin ? '任務管理' : '我的任務';
+
+  // Dependency info
+  const deps = (t.dependencies || []).map(did => AppState.tasks.find(tk => tk.id === did)).filter(Boolean);
+  const depBlocked = deps.some(d => d.status !== 'done');
 
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter">
@@ -40,9 +51,20 @@ function renderTaskDetail() {
                   <span class="badge ${AppState.statusBadge(t.status)}">${AppState.statusLabel(t.status)}</span>
                   <span class="badge ${AppState.priorityBadge(t.priority)}">${AppState.priorityLabel(t.priority)} 優先度</span>
                   <span class="text-sm text-gray-400">${svgIcon('clock', 14)} 截止：${t.dueDate}</span>
+                  ${t.mood ? `<span style="font-size:20px" title="心情回饋">${t.mood}</span>` : ''}
                 </div>
               </div>
             </div>
+
+            <!-- Dependency warning -->
+            ${depBlocked ? `
+              <div class="mb-4 flex items-center gap-2 rounded-lg px-4 py-3" style="background:#fff7ed;border:1.5px solid #fed7aa">
+                <span style="color:#f97316;font-size:18px">⚠️</span>
+                <div>
+                  <div class="text-sm font-semibold" style="color:#ea580c">前置任務尚未完成</div>
+                  <div class="text-xs" style="color:#9a3412">需先完成：${deps.filter(d=>d.status!=='done').map(d=>d.name).join('、')}</div>
+                </div>
+              </div>` : ''}
 
             <!-- Progress -->
             <div class="mb-4">
@@ -55,7 +77,7 @@ function renderTaskDetail() {
 
             <!-- Action buttons -->
             <div class="flex gap-3 flex-wrap">
-              ${t.status === 'pending' ? `<button onclick="updateTaskStatus(${t.id},'active')" class="btn btn-primary">${svgIcon('activity', 14)} 開始作業</button>` : ''}
+              ${t.status === 'pending' ? `<button onclick="updateTaskStatus(${t.id},'active')" class="btn btn-primary" ${depBlocked?'disabled title="請先完成前置任務"':''}>${svgIcon('activity', 14)} 開始作業</button>` : ''}
               ${t.status === 'active' ? `
                 <button onclick="updateTaskStatus(${t.id},'done')" class="btn btn-success">${svgIcon('check', 14)} 標記完成</button>
                 <button onclick="openProgressModal(${t.id})" class="btn btn-secondary">${svgIcon('chart', 14)} 更新進度</button>
@@ -64,6 +86,9 @@ function renderTaskDetail() {
               ${isAdmin ? `<button onclick="openEditTaskModal(${t.id})" class="btn btn-secondary">${svgIcon('edit', 14)} 編輯任務</button>` : ''}
             </div>
           </div>
+
+          <!-- Mood Feedback card (only for assignee or admin) -->
+          ${(isAssignee || isAdmin) ? renderMoodCard(t) : ''}
 
           <!-- Description card -->
           <div class="card">
@@ -128,6 +153,17 @@ function renderTaskDetail() {
                 <div class="text-xs text-gray-400 mb-1">狀態</div>
                 <span class="badge ${AppState.statusBadge(t.status)}">${AppState.statusLabel(t.status)}</span>
               </div>
+              ${deps.length ? `
+              <div>
+                <div class="text-xs text-gray-400 mb-1">前置任務</div>
+                <div class="flex flex-col gap-1">
+                  ${deps.map(d => `
+                    <div class="flex items-center gap-1 text-xs">
+                      <span style="color:${d.status==='done'?'#22c55e':'#94a3b8'}">${d.status==='done'?'✓':'○'}</span>
+                      <span class="${d.status==='done'?'line-through text-gray-300':'text-gray-600'}">${d.name}</span>
+                    </div>`).join('')}
+                </div>
+              </div>` : ''}
             </div>
           </div>
 
@@ -142,6 +178,59 @@ function renderTaskDetail() {
       </div>
     </div>`;
 }
+
+// ── Mood Card ──────────────────────────────────────────────
+
+function renderMoodCard(t) {
+  return `
+    <div class="card">
+      <h3 class="font-bold text-gray-800 mb-1">心情回饋 <span class="text-xs font-normal text-gray-400 ml-1">— 目前工作狀態如何？</span></h3>
+      <p class="text-xs text-gray-400 mb-3">選擇最符合你現在狀況的心情，讓管理員掌握團隊狀態</p>
+      <div class="flex gap-3 flex-wrap" id="mood-btns">
+        ${MOOD_OPTIONS.map(m => `
+          <button onclick="selectMood(${t.id},'${m.emoji}')"
+            class="mood-btn flex flex-col items-center gap-1 px-4 py-3 rounded-xl border-2 transition-all"
+            id="mood-${m.emoji.codePointAt(0)}"
+            style="border-color:${t.mood===m.emoji ? m.color : '#e5e7eb'};background:${t.mood===m.emoji ? m.color+'18' : 'white'}">
+            <span style="font-size:28px">${m.emoji}</span>
+            <span class="text-xs font-medium" style="color:${t.mood===m.emoji ? m.color : '#6b7280'}">${m.label}</span>
+          </button>`).join('')}
+      </div>
+      ${t.mood ? `<p class="text-xs mt-3" style="color:#6b7280">已回饋：${t.mood} ${MOOD_OPTIONS.find(m=>m.emoji===t.mood)?.label || ''}</p>` : ''}
+    </div>`;
+}
+
+function selectMood(taskId, emoji) {
+  const t = AppState.tasks.find(t => t.id === taskId);
+  if (!t) return;
+  t.mood = (t.mood === emoji) ? null : emoji; // toggle
+  const moodObj = MOOD_OPTIONS.find(m => m.emoji === emoji);
+
+  // Re-render mood card area only
+  const moodSection = document.getElementById('mood-btns')?.closest('.card');
+  if (moodSection) moodSection.outerHTML = renderMoodCard(t).match(/<div class="card">([\s\S]*)<\/div>/)?.[0] || '';
+
+  // Update mood display in header badges
+  renderTaskDetail();
+
+  // Push notification to admin if stressed
+  if (t.mood === '😤' || t.mood === '😟') {
+    const assignee = AppState.getUser(t.assignee);
+    AppState.notifications.unshift({
+      id: Date.now(),
+      type: 'mood',
+      icon: 'heart',
+      title: '成員情緒警示',
+      message: `${assignee ? assignee.name : '成員'} 在任務「${t.name}」回饋心情：${t.mood}，請適時關懷`,
+      time: '剛剛',
+      read: false,
+    });
+  }
+
+  showToast(`心情已記錄 ${t.mood ? t.mood : '（已清除）'}`, 'success');
+}
+
+// ── Chat ───────────────────────────────────────────────────
 
 function renderTaskChatMessages(discussions) {
   const u = AppState.currentUser;
@@ -173,18 +262,31 @@ function addTaskComment(taskId) {
   input.value = '';
   const chat = document.getElementById('task-chat');
   if (chat) {
-    const newDiscussions = AppState.getDiscussionsByTask(taskId);
-    chat.innerHTML = renderTaskChatMessages(newDiscussions);
+    chat.innerHTML = renderTaskChatMessages(AppState.getDiscussionsByTask(taskId));
     chat.scrollTop = chat.scrollHeight;
   }
 }
 
+// ── Status / Progress ──────────────────────────────────────
+
 function updateTaskStatus(taskId, newStatus) {
   const t = AppState.tasks.find(t => t.id === taskId);
   if (!t) return;
+
+  // Block if dependencies not done
+  if (newStatus === 'active') {
+    const deps = (t.dependencies || []).map(did => AppState.tasks.find(tk => tk.id === did)).filter(Boolean);
+    const blocked = deps.filter(d => d.status !== 'done');
+    if (blocked.length) {
+      showToast(`請先完成前置任務：${blocked.map(d=>d.name).join('、')}`, 'error');
+      return;
+    }
+  }
+
   t.status = newStatus;
   if (newStatus === 'done') t.progress = 100;
   if (newStatus === 'active' && t.progress === 0) t.progress = 5;
+  checkRiskAlerts();
   renderTaskDetail();
   showToast(newStatus === 'done' ? '任務已標記為完成！' : '任務已開始執行', 'success');
 }
@@ -199,6 +301,6 @@ function openProgressModal(taskId) {
       <div class="flex justify-between text-xs text-gray-400 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
     </div>`,
     `<button onclick="closeModal()" class="btn btn-secondary">取消</button>
-     <button onclick="t=${taskId};AppState.tasks.find(tk=>tk.id===t).progress=parseInt(document.getElementById('prog-slider').value);closeModal();renderTaskDetail();showToast('進度已更新','success')" class="btn btn-primary">儲存</button>`
+     <button onclick="(function(){var tk=AppState.tasks.find(t=>t.id===${taskId});tk.progress=parseInt(document.getElementById('prog-slider').value);checkRiskAlerts();closeModal();renderTaskDetail();showToast('進度已更新','success');})()" class="btn btn-primary">儲存</button>`
   ));
 }

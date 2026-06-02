@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     renderAuthPage(startPage);
   }
+
+  // UC31: Run risk scan on startup (will add alerts to notifications)
+  setTimeout(() => checkRiskAlerts(), 800);
 });
 
 // Handle browser back/forward
