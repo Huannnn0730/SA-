@@ -89,6 +89,7 @@ function addMember() {
   AppState.members.push({ id, name, title, role, activeTasks: 0 });
   closeModal();
   document.getElementById('members-tbody').innerHTML = renderMemberRows();
+  saveAppState();
   showToast('成員已新增', 'success');
 }
 
@@ -124,6 +125,7 @@ function saveMember(id) {
   if (u) { u.name = m.name; u.title = m.title; u.role = m.role; }
   closeModal();
   document.getElementById('members-tbody').innerHTML = renderMemberRows();
+  saveAppState();
   showToast('成員已更新', 'success');
 }
 
@@ -133,6 +135,7 @@ function deleteMember(id) {
     AppState.members = AppState.members.filter(m => m.id !== id);
     AppState.users = AppState.users.filter(u => u.id !== id);
     document.getElementById('members-tbody').innerHTML = renderMemberRows();
+    saveAppState();
     showToast('成員已刪除', 'success');
   });
 }

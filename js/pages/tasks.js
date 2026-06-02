@@ -193,6 +193,7 @@ function kanbanDrop(event, newStatus) {
     if (newStatus === 'pending') t.progress = 0;
     showToast(`任務已移至「${AppState.statusLabel(newStatus)}」`, 'success');
     checkRiskAlerts();
+    saveAppState();
   }
   _draggingTaskId = null;
   refreshTaskView();
@@ -264,6 +265,7 @@ function addTask() {
   });
   closeModal();
   refreshTaskView();
+  saveAppState();
   showToast('任務已新增', 'success');
 }
 
@@ -348,6 +350,7 @@ function saveTask(id) {
   closeModal();
   refreshTaskView();
   checkRiskAlerts();
+  saveAppState();
   showToast('任務已更新', 'success');
 }
 
@@ -355,6 +358,7 @@ function deleteTask(id) {
   confirmModal('刪除任務', '確定要刪除此任務嗎？', () => {
     AppState.tasks = AppState.tasks.filter(t => t.id !== id);
     refreshTaskView();
+    saveAppState();
     showToast('任務已刪除', 'success');
   });
 }

@@ -52,6 +52,7 @@ function renderNotifications() {
 
 function markAllRead() {
   AppState.notifications.forEach(n => n.read = true);
+  saveAppState();
   renderNotifications();
   updateNotifBadge();
   updateSidebarActive();
@@ -63,6 +64,7 @@ function readNotif(id) {
   const n = AppState.notifications.find(n => n.id === id);
   if (!n) return;
   n.read = true;
+  saveAppState();
   updateNotifBadge();
   renderHeader();
 

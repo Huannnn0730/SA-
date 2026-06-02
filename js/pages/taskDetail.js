@@ -227,6 +227,7 @@ function selectMood(taskId, emoji) {
     });
   }
 
+  saveAppState();
   showToast(`心情已記錄 ${t.mood ? t.mood : '（已清除）'}`, 'success');
 }
 
@@ -259,6 +260,7 @@ function addTaskComment(taskId) {
   const now = new Date();
   const timeStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   AppState.discussions.push({ id: AppState.discussions.length + 1, taskId, user: u.id, message: msg, time: timeStr, read: false });
+  saveAppState();
   input.value = '';
   const chat = document.getElementById('task-chat');
   if (chat) {
@@ -287,6 +289,7 @@ function updateTaskStatus(taskId, newStatus) {
   if (newStatus === 'done') t.progress = 100;
   if (newStatus === 'active' && t.progress === 0) t.progress = 5;
   checkRiskAlerts();
+  saveAppState();
   renderTaskDetail();
   showToast(newStatus === 'done' ? '任務已標記為完成！' : '任務已開始執行', 'success');
 }
@@ -301,6 +304,6 @@ function openProgressModal(taskId) {
       <div class="flex justify-between text-xs text-gray-400 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
     </div>`,
     `<button onclick="closeModal()" class="btn btn-secondary">取消</button>
-     <button onclick="(function(){var tk=AppState.tasks.find(t=>t.id===${taskId});tk.progress=parseInt(document.getElementById('prog-slider').value);checkRiskAlerts();closeModal();renderTaskDetail();showToast('進度已更新','success');})()" class="btn btn-primary">儲存</button>`
+     <button onclick="(function(){var tk=AppState.tasks.find(t=>t.id===${taskId});tk.progress=parseInt(document.getElementById('prog-slider').value);checkRiskAlerts();saveAppState();closeModal();renderTaskDetail();showToast('進度已更新','success');})()" class="btn btn-primary">儲存</button>`
   ));
 }

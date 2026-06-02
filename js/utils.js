@@ -164,6 +164,37 @@ function getRiskTasks() {
   });
 }
 
+// ============================================================
+// STATE PERSISTENCE (localStorage)
+// ============================================================
+
+function saveAppState() {
+  try {
+    localStorage.setItem('appState', JSON.stringify({
+      users:         AppState.users,
+      projects:      AppState.projects,
+      tasks:         AppState.tasks,
+      notifications: AppState.notifications,
+      members:       AppState.members,
+      discussions:   AppState.discussions,
+    }));
+  } catch(e) {}
+}
+
+function loadAppState() {
+  try {
+    const raw = localStorage.getItem('appState');
+    if (!raw) return;
+    const s = JSON.parse(raw);
+    if (s.users)         AppState.users         = s.users;
+    if (s.projects)      AppState.projects      = s.projects;
+    if (s.tasks)         AppState.tasks         = s.tasks;
+    if (s.notifications) AppState.notifications = s.notifications;
+    if (s.members)       AppState.members       = s.members;
+    if (s.discussions)   AppState.discussions   = s.discussions;
+  } catch(e) {}
+}
+
 function checkRiskAlerts() {
   const risks = getRiskTasks();
   risks.forEach(t => {
@@ -183,4 +214,5 @@ function checkRiskAlerts() {
       });
     }
   });
+  saveAppState();
 }

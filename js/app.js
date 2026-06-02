@@ -3,6 +3,9 @@
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Restore persisted data first
+  loadAppState();
+
   // Restore session from sessionStorage
   const savedId = sessionStorage.getItem('userId');
   if (savedId) {

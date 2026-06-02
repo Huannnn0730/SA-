@@ -86,6 +86,7 @@ function addProject() {
   });
   closeModal();
   document.getElementById('projects-tbody').innerHTML = renderProjectRows();
+  saveAppState();
   showToast('專案已新增', 'success');
 }
 
@@ -129,6 +130,7 @@ function saveProject(id) {
   p.progress = parseInt(document.getElementById('edit-proj-progress').value);
   closeModal();
   document.getElementById('projects-tbody').innerHTML = renderProjectRows();
+  saveAppState();
   showToast('專案已更新', 'success');
 }
 
@@ -136,6 +138,7 @@ function deleteProject(id) {
   confirmModal('刪除專案', '確定要刪除此專案嗎？此操作無法復原。', () => {
     AppState.projects = AppState.projects.filter(p => p.id !== id);
     document.getElementById('projects-tbody').innerHTML = renderProjectRows();
+    saveAppState();
     showToast('專案已刪除', 'success');
   });
 }

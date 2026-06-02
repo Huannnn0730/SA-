@@ -100,6 +100,7 @@ function handleRegister() {
   };
   AppState.users.push(newUser);
   AppState.members.push({ id: newUser.id, name, title: newUser.title, role: newUser.role, activeTasks: 0 });
+  saveAppState();
   showToast('註冊成功！請登入', 'success');
   navigateAuth('login');
 }
