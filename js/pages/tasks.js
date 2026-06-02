@@ -284,7 +284,7 @@ function openEditTaskModal(id) {
         <div>
           <label class="form-label">負責人</label>
           <select id="etk-assignee" class="form-input form-select">
-            ${AppState.members.map(m => `<option value="${m.id}" ${t.assignee===m.id?'selected':''}>${m.name}</option>`).join('')}
+            ${AppState.members.filter(m => m.role !== 'admin').map(m => `<option value="${m.id}" ${t.assignee===m.id?'selected':''}>${m.name}</option>`).join('')}
           </select>
         </div>
       </div>

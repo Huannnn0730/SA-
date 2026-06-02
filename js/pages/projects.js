@@ -195,6 +195,6 @@ function openProjectDetail(id) {
       </table>
     </div>`,
     `<button onclick="closeModal()" class="btn btn-secondary">關閉</button>
-     <button onclick="closeModal();_addTaskForProject=${id};navigateTo('tasks');setTimeout(openAddTaskModal,50)" class="btn btn-primary">${svgIcon('plus',14)} 新增任務</button>`
+     <button onclick="closeModal();_addTaskForProject=${id};navigateTo('tasks');openAddTaskModal()" class="btn btn-primary">${svgIcon('plus',14)} 新增任務</button>`
   ));
 }
