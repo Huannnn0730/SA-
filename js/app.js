@@ -9,10 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   AppState.currentPage = startPage;
 
+  const authPages = ['login', 'register', 'forgot'];
   if (AppState.currentUser) {
-    navigateTo(startPage === 'login' ? 'dashboard' : startPage);
+    navigateTo(authPages.includes(startPage) ? 'dashboard' : startPage);
   } else {
-    renderAuthPage(startPage);
+    renderAuthPage(authPages.includes(startPage) ? startPage : 'login');
   }
 
   // UC31: Run risk scan on startup (will add alerts to notifications)
