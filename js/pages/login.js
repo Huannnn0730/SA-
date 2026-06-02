@@ -36,11 +36,6 @@ function renderLogin() {
           <button onclick="navigateAuth('forgot')" class="text-blue-600 hover:text-blue-700 font-medium">忘記密碼？</button>
         </div>
         <button onclick="handleLogin()" class="btn btn-primary w-full justify-center" style="height:44px;font-size:15px">登入</button>
-        <div class="auth-divider">或</div>
-        <button class="btn btn-secondary w-full justify-center gap-3" style="height:44px;font-size:14px">
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" width="18" height="18" />
-          使用 Google 帳號登入
-        </button>
       </div>
 
       <p class="text-center text-sm text-gray-500 mt-6">
