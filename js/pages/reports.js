@@ -39,9 +39,9 @@ function switchReportTab(tab) {
 // ── Overview Tab ───────────────────────────────────────────
 
 function renderOverviewTab() {
-  const rd = AppState.reportData;
+  const rd = AppState.getReportData();
   const totalTasks = rd.taskDist.reduce((a, b) => a + b.value, 0);
-  const maxHours = Math.max(...rd.hoursData.map(d => d.hours));
+  const maxTaskVal = Math.max(...rd.taskData.map(d => d.value), 1);
 
   return `
     <!-- Summary stats -->
@@ -57,9 +57,9 @@ function renderOverviewTab() {
         <div class="text-xs text-red-500 mt-1 font-medium">↑2 較上月</div>
       </div>
       <div class="card text-center">
-        <div class="text-4xl font-black text-purple-600 mb-1">${rd.totalHours}</div>
-        <div class="text-sm text-gray-500">總工時（小時）</div>
-        <div class="text-xs text-red-500 mt-1 font-medium">↑28 較上月</div>
+        <div class="text-4xl font-black text-purple-600 mb-1">${AppState.tasks.length}</div>
+        <div class="text-sm text-gray-500">任務總數</div>
+        <div class="text-xs text-gray-400 mt-1 font-medium">含所有狀態</div>
       </div>
     </div>
 
@@ -85,18 +85,18 @@ function renderOverviewTab() {
         </div>
       </div>
 
-      <!-- Hours bar chart -->
+      <!-- Tasks per member -->
       <div class="card">
-        <h3 class="font-bold text-gray-800 mb-4">工時統計（小時）</h3>
+        <h3 class="font-bold text-gray-800 mb-4">成員任務負載（進行中任務數）</h3>
         <div class="overflow-x-auto">
-          ${barChart(rd.hoursData, maxHours, 340, 140)}
+          ${barChart(rd.taskData.map(d => ({name: d.name, hours: d.value})), maxTaskVal, 340, 140)}
         </div>
         <div class="flex flex-col gap-2 mt-4">
-          ${rd.hoursData.map(d => `
+          ${rd.taskData.map(d => `
             <div class="flex items-center gap-3 text-sm">
               <span class="text-gray-600 w-16 flex-shrink-0">${d.name}</span>
-              <div class="flex-1">${progressBar(Math.round(d.hours / maxHours * 100), 'progress-blue', 8)}</div>
-              <span class="font-semibold text-gray-700 w-12 text-right">${d.hours}h</span>
+              <div class="flex-1">${progressBar(maxTaskVal > 0 ? Math.round(d.value / maxTaskVal * 100) : 0, 'progress-blue', 8)}</div>
+              <span class="font-semibold text-gray-700 w-12 text-right">${d.value} 個</span>
             </div>`).join('')}
         </div>
       </div>
@@ -151,13 +151,12 @@ function renderHeatmapTab() {
   function getLoad(memberId, day) {
     const dayStr = `${day.getFullYear()}/${String(day.getMonth()+1).padStart(2,'0')}/${String(day.getDate()).padStart(2,'0')}`;
     const memberTasks = AppState.tasks.filter(t => t.assignee === memberId && t.status !== 'done');
-    // Count tasks that span this day (between now and their dueDate)
     return memberTasks.filter(t => {
       if (!t.dueDate || t.dueDate === '—') return false;
-      const due = new Date(t.dueDate.replace(/\//g, '-'));
-      due.setHours(0,0,0,0);
-      const start = new Date(due);
-      start.setDate(due.getDate() - 7); // assume tasks span ~7 days before due
+      const due = new Date(t.dueDate.replace(/\//g, '-')); due.setHours(0,0,0,0);
+      const start = t.startDate
+        ? (() => { const d = new Date(t.startDate.replace(/\//g, '-')); d.setHours(0,0,0,0); return d; })()
+        : (() => { const d = new Date(due); d.setDate(due.getDate() - 7); return d; })();
       return day >= start && day <= due;
     }).length;
   }

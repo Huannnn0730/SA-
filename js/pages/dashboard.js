@@ -7,7 +7,13 @@ function renderDashboard() {
   const totalProjects = AppState.projects.length;
   const activeTasks = AppState.tasks.filter(t => t.status === 'active').length;
   const doneTasks = AppState.tasks.filter(t => t.status === 'done').length;
-  const overdueTasks = 6;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const parseDate = s => { const d = new Date(s.replace(/\//g, '-')); d.setHours(0,0,0,0); return d; };
+  const overdueTasks = AppState.tasks.filter(t => {
+    if (t.status === 'done') return false;
+    if (!t.dueDate || t.dueDate === '—') return false;
+    return parseDate(t.dueDate) < today;
+  }).length;
 
   // Project donut
   const activeP = AppState.projects.filter(p => p.status === 'active').length;
@@ -25,7 +31,10 @@ function renderDashboard() {
   ];
 
   const todayTasks = AppState.tasks.filter(t => t.assignee === u.id && t.status === 'active').slice(0, 3);
-  const upcomingTasks = AppState.tasks.filter(t => t.status !== 'done').slice(0, 4);
+  const upcomingTasks = AppState.tasks
+    .filter(t => t.status !== 'done' && t.dueDate && t.dueDate !== '—')
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    .slice(0, 4);
 
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter flex flex-col gap-6">
@@ -76,12 +85,22 @@ function renderDashboard() {
             <button onclick="navigateTo('${u.role === 'admin' ? 'tasks' : 'my-tasks'}')" class="text-blue-600 text-sm font-medium hover:text-blue-700">更多 →</button>
           </div>
           <div class="flex flex-col gap-3">
-            ${[{time:'09:00',name:'需求文件撰寫',priority:'high'},{time:'11:00',name:'設計稿確認',priority:'mid'},{time:'14:00',name:'前端功能開發',priority:'high'}].map(t => `
-              <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <span class="text-xs text-gray-400 w-12 flex-shrink-0">${t.time}</span>
-                <span class="flex-1 text-sm font-medium text-gray-700">${t.name}</span>
-                <span class="badge ${AppState.priorityBadge(t.priority)} text-xs">${AppState.priorityLabel(t.priority)}</span>
-              </div>`).join('')}
+            ${(() => {
+              const myActive = AppState.tasks
+                .filter(t => (u.role === 'admin' || t.assignee === u.id) && t.status !== 'done')
+                .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+                .slice(0, 3);
+              if (!myActive.length) return `<div class="text-sm text-gray-400 text-center py-4">目前沒有進行中的任務</div>`;
+              return myActive.map(t => `
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors"
+                     onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')">
+                  <div class="flex-1 min-w-0">
+                    <div class="text-sm font-medium text-gray-700 truncate">${t.name}</div>
+                    <div class="text-xs text-gray-400">截止 ${t.dueDate}</div>
+                  </div>
+                  <span class="badge ${AppState.priorityBadge(t.priority)} text-xs">${AppState.priorityLabel(t.priority)}</span>
+                </div>`).join('');
+            })()}
           </div>
         </div>
 
@@ -140,7 +159,7 @@ function renderRiskPanel() {
           return `
             <div class="flex items-center gap-3 p-3 rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
                  style="background:${isHigh?'#fef2f2':'#fffbeb'};border:1px solid ${isHigh?'#fca5a5':'#fde68a'}"
-                 onclick="navigateTo('task-detail');AppState.currentTaskId=${r.id}">
+                 onclick="AppState.currentTaskId=${r.id};navigateTo('task-detail')">
               <span style="font-size:18px">${isHigh?'🔴':'🟡'}</span>
               <div class="flex-1 min-w-0">
                 <div class="text-sm font-semibold text-gray-800">${r.name}</div>

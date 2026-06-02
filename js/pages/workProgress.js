@@ -17,8 +17,14 @@ function renderWorkProgress() {
     { label: '未開始', value: pending, color: '#94a3b8' },
   ];
 
-  // Mock trend
-  const trendPoints = [{y:20},{y:30},{y:25},{y:40},{y:38},{y:55},{y:48},{y:60}];
+  // Per-project completion for trend display
+  const myProjects = [...new Set(myTasks.map(t => t.projectId))]
+    .map(pid => {
+      const proj = AppState.getProject(pid);
+      const pTasks = myTasks.filter(t => t.projectId === pid);
+      const pDone = pTasks.filter(t => t.status === 'done').length;
+      return { name: proj ? proj.name : `專案${pid}`, rate: pTasks.length ? Math.round(pDone / pTasks.length * 100) : 0 };
+    });
 
   const upcomingTasks = myTasks.filter(t => t.status !== 'done').sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 5);
 
@@ -64,13 +70,21 @@ function renderWorkProgress() {
           </div>
         </div>
 
-        <!-- Progress trend -->
+        <!-- Per-project completion -->
         <div class="card">
-          <h3 class="font-bold text-gray-800 mb-4">完成率趨勢</h3>
-          ${lineChartSvg(trendPoints, 340, 120, '#22c55e')}
-          <div class="flex justify-between text-xs text-gray-400 mt-1 px-2">
-            <span>4月初</span><span>4月中</span><span>5月初</span><span>5月中</span>
-          </div>
+          <h3 class="font-bold text-gray-800 mb-4">各專案完成狀況</h3>
+          ${myProjects.length === 0
+            ? `<div class="text-sm text-gray-400 text-center py-6">尚未加入任何專案</div>`
+            : `<div class="flex flex-col gap-4">
+                ${myProjects.map(p => `
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span class="text-gray-600 truncate">${p.name}</span>
+                      <span class="font-semibold text-gray-800 ml-2">${p.rate}%</span>
+                    </div>
+                    ${progressBar(p.rate, p.rate >= 80 ? 'progress-green' : p.rate >= 40 ? 'progress-blue' : 'progress-orange', 8)}
+                  </div>`).join('')}
+              </div>`}
         </div>
 
         <!-- Upcoming tasks -->

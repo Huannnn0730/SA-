@@ -2,7 +2,7 @@
 // CALENDAR PAGE
 // ============================================================
 
-let calYear = 2024, calMonth = 5; // 0-indexed: 5 = June
+var calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
 
 function renderCalendar() {
   document.getElementById('page-container').innerHTML = `
@@ -59,7 +59,7 @@ function renderCalGrid() {
 
   for (let d = 1; d <= daysInMonth; d++) {
     const dateKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const hasEvent = !!AppState.calendarEvents[dateKey];
+    const hasEvent = !!AppState.getCalendarEvents()[dateKey];
     const isToday = isCurrentMonth && d === today.getDate();
     cells += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}" onclick="showCalDayEvents('${dateKey}', ${d})">${d}</div>`;
   }
@@ -68,7 +68,7 @@ function renderCalGrid() {
 }
 
 function renderAllCalEvents() {
-  const events = Object.entries(AppState.calendarEvents).filter(([k]) => {
+  const events = Object.entries(AppState.getCalendarEvents()).filter(([k]) => {
     const [y, m] = k.split('-').map(Number);
     return y === calYear && m === calMonth + 1;
   });
@@ -85,7 +85,7 @@ function renderAllCalEvents() {
 }
 
 function showCalDayEvents(dateKey, day) {
-  const events = AppState.calendarEvents[dateKey];
+  const events = AppState.getCalendarEvents()[dateKey];
   if (!events) return;
   const content = `
     <h4 class="font-semibold text-gray-700 text-sm mb-3">${calMonth+1}/${day} 任務事件</h4>

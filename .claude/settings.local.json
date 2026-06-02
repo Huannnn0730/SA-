@@ -8,7 +8,11 @@
       "Bash(pip install *)",
       "Bash(python -c \"import sys; data=sys.stdin.buffer.read\\(\\); print\\(data.decode\\('utf-8','replace'\\)\\)\")",
       "Bash(python -m http.server 3030)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3030/)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3030/)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\user\\\\OneDrive\\\\桌面\\\\20260501_claude code\\\\專案排成管理系統\\\\js\" -Recurse -Filter \"*.js\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(git add *)"
     ]
   }
 }

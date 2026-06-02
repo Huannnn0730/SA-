@@ -61,10 +61,19 @@ function markAllRead() {
 
 function readNotif(id) {
   const n = AppState.notifications.find(n => n.id === id);
-  if (n) { n.read = true; }
-  renderNotifications();
+  if (!n) return;
+  n.read = true;
   updateNotifBadge();
   renderHeader();
+
+  if (n.taskId) {
+    AppState.currentTaskId = n.taskId;
+    navigateTo('task-detail');
+  } else if (n.projectId) {
+    navigateTo('projects');
+  } else {
+    renderNotifications();
+  }
 }
 
 function filterNotifs(btn, type) {
