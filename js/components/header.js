@@ -40,16 +40,8 @@ function renderHeader() {
           ${svgIcon('search', 16, 'search-icon')}
           <input class="form-input" style="width:200px;padding-left:36px;height:36px;font-size:13px" placeholder="搜尋專案、任務..." />
         </div>
-        <button onclick="navigateTo('notifications')" class="btn-icon relative">
-          ${svgIcon('bell', 20)}
-          <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" id="header-notif-dot" style="display:none"></span>
-        </button>
       </div>
     </header>`;
-
-  const dot = document.getElementById('header-notif-dot');
-  const unread = AppState.notifications.filter(n => !n.read).length;
-  if (dot) dot.style.display = unread > 0 ? 'block' : 'none';
 
   const hbBtn = document.getElementById('hamburger-btn');
   if (hbBtn) hbBtn.addEventListener('click', toggleSidebar);

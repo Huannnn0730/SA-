@@ -54,11 +54,11 @@ const AppState = {
   ],
 
   files: [
-    { id: 1, name: '需求流程.drawio', folder: '需求文件', size: '2.1 MB', date: '2026/05/20', icon: 'drawio' },
-    { id: 2, name: 'API 文件.pdf',    folder: '開發文件', size: '1.3 MB', date: '2026/05/18', icon: 'pdf' },
-    { id: 3, name: '測試報告.xlsx',   folder: '測試報告', size: '0.9 MB', date: '2026/05/15', icon: 'xlsx' },
-    { id: 4, name: 'UI設計稿.zip',    folder: '設計稿',   size: '8.4 MB', date: '2026/05/12', icon: 'zip' },
-    { id: 5, name: '系統架構圖.png',  folder: '需求文件', size: '0.5 MB', date: '2026/05/10', icon: 'image' },
+    { id: 1, name: '系統架構圖.png',  projectId: 1, size: '0.5 MB', date: '2026/05/10', icon: 'image' },
+    { id: 2, name: '需求流程.drawio', projectId: 1, size: '2.1 MB', date: '2026/05/20', icon: 'drawio' },
+    { id: 3, name: 'API 文件.pdf',    projectId: 1, size: '1.3 MB', date: '2026/05/18', icon: 'pdf' },
+    { id: 4, name: 'UI設計稿.zip',    projectId: 2, size: '8.4 MB', date: '2026/05/12', icon: 'zip' },
+    { id: 5, name: '測試報告.xlsx',   projectId: 3, size: '0.9 MB', date: '2026/05/15', icon: 'xlsx' },
   ],
 
   discussions: [

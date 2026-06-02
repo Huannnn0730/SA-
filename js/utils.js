@@ -177,6 +177,7 @@ function saveAppState() {
       notifications: AppState.notifications,
       notifVersion:  NOTIF_VERSION,
       members:       AppState.members,
+      files:         AppState.files,
       discussions:   AppState.discussions,
     }));
   } catch(e) {}
@@ -193,6 +194,7 @@ function loadAppState() {
     if (s.projects)      AppState.projects      = s.projects;
     if (s.tasks)         AppState.tasks         = s.tasks;
     if (s.members)       AppState.members       = s.members;
+    if (s.files)         AppState.files         = s.files;
     if (s.discussions)   AppState.discussions   = s.discussions;
     // Reset notifications if version mismatch
     if (s.notifications && s.notifVersion === NOTIF_VERSION) {
