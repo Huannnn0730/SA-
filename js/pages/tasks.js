@@ -2,7 +2,7 @@
 // TASK MANAGEMENT PAGE (Admin)
 // ============================================================
 
-let taskFilter = { status: 'all', assignee: 'all', search: '' };
+let taskFilter = { status: 'all', assignee: 'all', project: 'all', search: '' };
 let taskView = 'list'; // 'list' | 'kanban'
 
 function renderTasks() {
@@ -29,6 +29,10 @@ function renderTasks() {
 
         <!-- Filters -->
         <div class="flex flex-wrap gap-3 mb-4">
+          <select class="form-input form-select" style="width:140px" onchange="taskFilter.project=this.value;refreshTaskView()">
+            <option value="all">全部專案</option>
+            ${AppState.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+          </select>
           <select class="form-input form-select" style="width:140px" onchange="taskFilter.status=this.value;refreshTaskView()">
             <option value="all">全部狀態</option>
             <option value="active">進行中</option><option value="done">已完成</option>
@@ -65,6 +69,7 @@ function refreshTaskView() {
 
 function getFilteredTasks() {
   return AppState.tasks.filter(t => {
+    if (taskFilter.project !== 'all' && t.projectId !== parseInt(taskFilter.project)) return false;
     if (taskFilter.status !== 'all' && t.status !== taskFilter.status) return false;
     if (taskFilter.assignee !== 'all' && t.assignee !== parseInt(taskFilter.assignee)) return false;
     if (taskFilter.search && !t.name.includes(taskFilter.search)) return false;
