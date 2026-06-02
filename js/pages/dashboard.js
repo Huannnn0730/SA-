@@ -114,7 +114,7 @@ function renderDashboard() {
             ${upcomingTasks.map(t => {
               const proj = AppState.getProject(t.projectId);
               return `
-                <div class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer" onclick="navigateTo('task-detail');AppState.currentTaskId=${t.id}">
+                <div class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer" onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')">
                   <div class="flex-1 min-w-0">
                     <div class="text-sm font-medium text-gray-700 truncate">${t.name}</div>
                     <div class="text-xs text-gray-400">${proj ? proj.name : ''}</div>

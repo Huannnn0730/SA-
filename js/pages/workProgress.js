@@ -98,7 +98,7 @@ function renderWorkProgress() {
               : upcomingTasks.map(t => {
                   const proj = AppState.getProject(t.projectId);
                   return `
-                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors cursor-pointer" onclick="navigateTo('task-detail');AppState.currentTaskId=${t.id}">
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-blue-50 transition-colors cursor-pointer" onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')">
                       <div class="flex-1">
                         <div class="font-medium text-gray-800 text-sm">${t.name}</div>
                         <div class="text-xs text-gray-400 mt-0.5">${proj ? proj.name : '—'}</div>

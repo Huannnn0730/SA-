@@ -159,7 +159,7 @@ function renderKanbanCard(t) {
          ondragstart="kanbanDragStart(event,${t.id})"
          style="background:white;border-radius:8px;padding:12px;box-shadow:0 1px 4px rgba(0,0,0,0.08);cursor:grab;border:1.5px solid #f1f5f9;transition:box-shadow 0.15s">
       <div class="flex items-start justify-between gap-2 mb-2">
-        <button onclick="navigateTo('task-detail');AppState.currentTaskId=${t.id}"
+        <button onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')"
           class="text-sm font-medium text-gray-800 text-left hover:text-blue-600 transition-colors leading-snug">${t.name}</button>
         ${moodHtml}
       </div>

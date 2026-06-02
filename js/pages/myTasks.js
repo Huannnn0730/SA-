@@ -75,7 +75,7 @@ function renderMyTaskCards() {
     const priorityColors = { high: '#ef4444', mid: '#f97316', low: '#22c55e' };
     const pColor = priorityColors[t.priority] || '#94a3b8';
     return `
-      <div class="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer" onclick="navigateTo('task-detail');AppState.currentTaskId=${t.id}">
+      <div class="flex items-center gap-4 p-4 border border-gray-100 rounded-xl hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer" onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')">
         <div style="width:4px;height:60px;background:${pColor};border-radius:4px;flex-shrink:0"></div>
         <div class="flex-1 min-w-0">
           <div class="flex items-start justify-between gap-2 mb-2">
