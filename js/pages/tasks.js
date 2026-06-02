@@ -92,7 +92,7 @@ function renderTaskRows() {
     const user = AppState.getUser(t.assignee);
     return `<tr>
       <td class="font-medium">
-        <button onclick="navigateTo('task-detail');AppState.currentTaskId=${t.id}" class="text-left hover:text-blue-600 transition-colors">${t.name}</button>
+        <button onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')" class="text-left hover:text-blue-600 transition-colors">${t.name}</button>
       </td>
       <td class="text-gray-500 text-sm">${proj ? proj.name : '—'}</td>
       <td>
