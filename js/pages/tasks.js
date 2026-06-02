@@ -36,7 +36,7 @@ function renderTasks() {
           </select>
           <select class="form-input form-select" style="width:140px" onchange="taskFilter.assignee=this.value;refreshTaskView()">
             <option value="all">全部負責人</option>
-            ${AppState.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+            ${AppState.members.filter(m => m.role !== 'admin').map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
           </select>
           <div class="search-input-wrap flex-1" style="min-width:180px">
             ${svgIcon('search', 16, 'search-icon')}
@@ -218,7 +218,7 @@ function openAddTaskModal() {
         <div>
           <label class="form-label">負責人</label>
           <select id="tk-assignee" class="form-input form-select">
-            ${AppState.members.map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
+            ${AppState.members.filter(m => m.role !== 'admin').map(m => `<option value="${m.id}">${m.name}</option>`).join('')}
           </select>
         </div>
       </div>

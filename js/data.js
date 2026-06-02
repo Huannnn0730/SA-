@@ -27,13 +27,13 @@ const AppState = {
   // 風險: task3 截止近且進度低 (高風險示範)
   // 心情: task2(😟 壓力), task5(😊 順利), task6(🔥 全力衝刺)
   tasks: [
-    { id: 1, projectId: 1, name: '系統架構規劃',  assignee: 1, priority: 'high', startDate: '2026/05/01', dueDate: '2026/05/20', status: 'done',   progress: 100, desc: '規劃整體系統架構，包含資料庫設計、API 設計與部署方案。',                           comments: [], attachments: ['架構圖.png'], dependencies: [],    mood: '😊' },
+    { id: 1, projectId: 1, name: '系統架構規劃',  assignee: 4, priority: 'high', startDate: '2026/05/01', dueDate: '2026/05/20', status: 'done',   progress: 100, desc: '規劃整體系統架構，包含資料庫設計、API 設計與部署方案。',                           comments: [], attachments: ['架構圖.png'], dependencies: [],    mood: '😊' },
     { id: 2, projectId: 1, name: '前端介面開發',  assignee: 3, priority: 'high', startDate: '2026/05/20', dueDate: '2026/06/20', status: 'active', progress: 45,  desc: '根據設計稿實作前端介面，使用 React + TypeScript 技術棧，串接後端 API。',           comments: [], attachments: [],           dependencies: [1],   mood: '😟' },
     { id: 3, projectId: 1, name: '後端 API 開發', assignee: 4, priority: 'high', startDate: '2026/05/20', dueDate: '2026/06/04', status: 'active', progress: 20,  desc: '開發 RESTful API，包含用戶管理、專案管理、任務管理等核心模組。',                     comments: [], attachments: [],           dependencies: [],    mood: null },
     { id: 4, projectId: 1, name: '整合測試',      assignee: 5, priority: 'mid',  startDate: '2026/06/25', dueDate: '2026/07/15', status: 'pending',progress: 0,   desc: '前後端整合完成後，執行功能測試、壓力測試與安全性測試，並修復問題。',               comments: [], attachments: [],           dependencies: [2,3], mood: null },
     { id: 5, projectId: 2, name: '行銷素材製作',  assignee: 2, priority: 'mid',  startDate: '2026/05/10', dueDate: '2026/05/28', status: 'done',   progress: 100, desc: '製作社群媒體廣告素材、EDM 模板與活動頁面視覺設計。',                                 comments: [], attachments: ['素材包.zip'], dependencies: [],   mood: '😊' },
     { id: 6, projectId: 2, name: '活動頁面開發',  assignee: 3, priority: 'high', startDate: '2026/05/28', dueDate: '2026/06/25', status: 'paused', progress: 35,  desc: '開發活動登陸頁面，串接報名系統與 Google Analytics，目前因設計調整暫停。',           comments: [], attachments: [],           dependencies: [5],   mood: '🔥' },
-    { id: 7, projectId: 3, name: 'APP 需求分析',  assignee: 1, priority: 'mid',  startDate: '2026/06/05', dueDate: '2026/06/30', status: 'active', progress: 10,  desc: '收集並分析 APP 功能需求，訪談利害關係人，產出完整需求規格書。',                     comments: [], attachments: [],           dependencies: [],    mood: null },
+    { id: 7, projectId: 3, name: 'APP 需求分析',  assignee: 3, priority: 'mid',  startDate: '2026/06/05', dueDate: '2026/06/30', status: 'active', progress: 10,  desc: '收集並分析 APP 功能需求，訪談利害關係人，產出完整需求規格書。',                     comments: [], attachments: [],           dependencies: [],    mood: null },
   ],
 
   notifications: [
