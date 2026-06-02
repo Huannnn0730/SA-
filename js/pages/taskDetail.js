@@ -77,8 +77,8 @@ function renderTaskDetail() {
 
             <!-- Action buttons -->
             <div class="flex gap-3 flex-wrap">
-              ${t.status === 'pending' ? `<button onclick="updateTaskStatus(${t.id},'active')" class="btn btn-primary" ${depBlocked?'disabled title="請先完成前置任務"':''}>${svgIcon('activity', 14)} 開始作業</button>` : ''}
-              ${t.status === 'active' ? `
+              ${(isAssignee || isAdmin) && t.status === 'pending' ? `<button onclick="updateTaskStatus(${t.id},'active')" class="btn btn-primary" ${depBlocked?'disabled title="請先完成前置任務"':''}>${svgIcon('activity', 14)} 開始作業</button>` : ''}
+              ${(isAssignee || isAdmin) && t.status === 'active' ? `
                 <button onclick="updateTaskStatus(${t.id},'done')" class="btn btn-success">${svgIcon('check', 14)} 標記完成</button>
                 <button onclick="openProgressModal(${t.id})" class="btn btn-secondary">${svgIcon('chart', 14)} 更新進度</button>
               ` : ''}

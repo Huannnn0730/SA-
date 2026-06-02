@@ -43,10 +43,20 @@ function navigateAuth(page) {
   renderAuthPage(page);
 }
 
+const adminOnlyPages = ['projects', 'tasks', 'gantt', 'members', 'reports'];
+
 function renderPage(page) {
   if (!AppState.currentUser) {
     renderAuthPage(page);
     return;
+  }
+
+  // Redirect executor away from admin-only pages
+  if (adminOnlyPages.includes(page) && AppState.currentUser.role !== 'admin') {
+    showToast('權限不足，已返回首頁', 'error');
+    page = 'dashboard';
+    AppState.currentPage = page;
+    window.location.hash = '#' + page;
   }
 
   showApp();
