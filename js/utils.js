@@ -175,11 +175,14 @@ function saveAppState() {
       projects:      AppState.projects,
       tasks:         AppState.tasks,
       notifications: AppState.notifications,
+      notifVersion:  NOTIF_VERSION,
       members:       AppState.members,
       discussions:   AppState.discussions,
     }));
   } catch(e) {}
 }
+
+const NOTIF_VERSION = 2;
 
 function loadAppState() {
   try {
@@ -189,9 +192,12 @@ function loadAppState() {
     if (s.users)         AppState.users         = s.users;
     if (s.projects)      AppState.projects      = s.projects;
     if (s.tasks)         AppState.tasks         = s.tasks;
-    if (s.notifications) AppState.notifications = s.notifications;
     if (s.members)       AppState.members       = s.members;
     if (s.discussions)   AppState.discussions   = s.discussions;
+    // Reset notifications if version mismatch
+    if (s.notifications && s.notifVersion === NOTIF_VERSION) {
+      AppState.notifications = s.notifications;
+    }
   } catch(e) {}
 }
 
