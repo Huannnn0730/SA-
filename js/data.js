@@ -16,33 +16,32 @@ const AppState = {
   ],
 
   projects: [
-    { id: 1, name: '管理後台優先專案', status: 'active',   startDate: '2026/05/01', endDate: '2026/07/31', progress: 60 },
-    { id: 2, name: '行銷活動專案',     status: 'active',   startDate: '2026/05/10', endDate: '2026/06/30', progress: 45 },
-    { id: 3, name: '內部系統開發',     status: 'done',     startDate: '2026/03/01', endDate: '2026/05/15', progress: 100 },
-    { id: 4, name: '品牌設計計劃',     status: 'paused',   startDate: '2026/04/01', endDate: '2026/05/31', progress: 30 },
-    { id: 5, name: 'APP 開發專案',     status: 'pending',  startDate: '2026/06/01', endDate: '2026/09/30', progress: 0  },
+    { id: 1, name: '管理後台系統',   status: 'active',  startDate: '2026/05/01', endDate: '2026/07/31', progress: 40 },
+    { id: 2, name: '行銷活動專案',   status: 'active',  startDate: '2026/05/10', endDate: '2026/06/30', progress: 65 },
+    { id: 3, name: 'APP 開發專案',   status: 'pending', startDate: '2026/06/01', endDate: '2026/08/31', progress: 0  },
   ],
 
+  // 7 tasks covering all demo features:
+  // 依賴鏈: 2→1, 4→[2,3], 6→5
+  // 狀態: done×2, active×3, paused×1, pending×1 (kanban 4欄全涵蓋)
+  // 風險: task3 截止近且進度低 (高風險示範)
+  // 心情: task2(😟 壓力), task5(😊 順利), task6(🔥 全力衝刺)
   tasks: [
-    { id: 1,  projectId: 1, name: '需求文件撰寫',   assignee: 1, priority: 'high', startDate: '2026/05/15', dueDate: '2026/06/03', status: 'active',  progress: 20,  desc: '撰寫會員系統的完整需求規格書，包含功能需求、非功能需求與介面設計規範。', comments: [], attachments: ['需求文件.pdf'], dependencies: [], mood: null },
-    { id: 2,  projectId: 1, name: '設計稿確認',     assignee: 2, priority: 'high', startDate: '2026/05/25', dueDate: '2026/06/10', status: 'active',  progress: 15,  desc: '確認所有頁面的設計稿，包含桌面版與手機版，並提交給開發團隊。', comments: [], attachments: ['設計稿.zip'], dependencies: [1], mood: '😟' },
-    { id: 3,  projectId: 1, name: '前端開發',       assignee: 3, priority: 'mid',  startDate: '2026/05/28', dueDate: '2026/06/15', status: 'active',  progress: 45,  desc: '根據設計稿實作前端介面，使用 React + TypeScript 技術棧。', comments: [], attachments: [], dependencies: [2], mood: '🔥' },
-    { id: 4,  projectId: 1, name: '後端 API 開發',  assignee: 4, priority: 'high', startDate: '2026/05/20', dueDate: '2026/06/20', status: 'active',  progress: 40,  desc: '開發 RESTful API，包含用戶管理、專案管理、任務管理等模組。', comments: [], attachments: [], dependencies: [], mood: '😊' },
-    { id: 5,  projectId: 1, name: '測試與修正',     assignee: 5, priority: 'mid',  startDate: '2026/06/20', dueDate: '2026/07/20', status: 'pending', progress: 0,   desc: '執行功能測試、壓力測試與安全性測試，並修復發現的問題。', comments: [], attachments: [], dependencies: [3, 4], mood: null },
-    { id: 6,  projectId: 2, name: '行銷素材製作',   assignee: 2, priority: 'mid',  startDate: '2026/05/10', dueDate: '2026/05/25', status: 'done',    progress: 100, desc: '製作社群媒體廣告素材、EDM 模板與活動頁面設計。', comments: [], attachments: [], dependencies: [], mood: '😊' },
-    { id: 7,  projectId: 2, name: '活動頁面開發',   assignee: 3, priority: 'high', startDate: '2026/05/25', dueDate: '2026/06/10', status: 'active',  progress: 55,  desc: '開發活動登陸頁面，串接報名系統與 Google Analytics。', comments: [], attachments: [], dependencies: [6], mood: null },
-    { id: 8,  projectId: 3, name: '系統架構規劃',   assignee: 1, priority: 'high', startDate: '2026/03/01', dueDate: '2026/03/20', status: 'done',    progress: 100, desc: '規劃整體系統架構，包含資料庫設計、API 設計與部署方案。', comments: [], attachments: [], dependencies: [], mood: null },
-    { id: 9,  projectId: 4, name: '品牌識別設計',   assignee: 2, priority: 'low',  startDate: '2026/04/20', dueDate: '2026/05/10', status: 'paused',  progress: 30,  desc: '設計新品牌識別系統，包含 Logo、色彩規範與字體使用準則。', comments: [], attachments: [], dependencies: [], mood: null },
-    { id: 10, projectId: 5, name: 'APP 需求分析',   assignee: 1, priority: 'mid',  startDate: '2026/06/01', dueDate: '2026/06/15', status: 'pending', progress: 0,   desc: '收集並分析 APP 功能需求，產出需求規格書。', comments: [], attachments: [], dependencies: [], mood: null },
+    { id: 1, projectId: 1, name: '系統架構規劃',  assignee: 1, priority: 'high', startDate: '2026/05/01', dueDate: '2026/05/20', status: 'done',   progress: 100, desc: '規劃整體系統架構，包含資料庫設計、API 設計與部署方案。',                           comments: [], attachments: ['架構圖.png'], dependencies: [],    mood: '😊' },
+    { id: 2, projectId: 1, name: '前端介面開發',  assignee: 3, priority: 'high', startDate: '2026/05/20', dueDate: '2026/06/20', status: 'active', progress: 45,  desc: '根據設計稿實作前端介面，使用 React + TypeScript 技術棧，串接後端 API。',           comments: [], attachments: [],           dependencies: [1],   mood: '😟' },
+    { id: 3, projectId: 1, name: '後端 API 開發', assignee: 4, priority: 'high', startDate: '2026/05/20', dueDate: '2026/06/04', status: 'active', progress: 20,  desc: '開發 RESTful API，包含用戶管理、專案管理、任務管理等核心模組。',                     comments: [], attachments: [],           dependencies: [],    mood: null },
+    { id: 4, projectId: 1, name: '整合測試',      assignee: 5, priority: 'mid',  startDate: '2026/06/25', dueDate: '2026/07/15', status: 'pending',progress: 0,   desc: '前後端整合完成後，執行功能測試、壓力測試與安全性測試，並修復問題。',               comments: [], attachments: [],           dependencies: [2,3], mood: null },
+    { id: 5, projectId: 2, name: '行銷素材製作',  assignee: 2, priority: 'mid',  startDate: '2026/05/10', dueDate: '2026/05/28', status: 'done',   progress: 100, desc: '製作社群媒體廣告素材、EDM 模板與活動頁面視覺設計。',                                 comments: [], attachments: ['素材包.zip'], dependencies: [],   mood: '😊' },
+    { id: 6, projectId: 2, name: '活動頁面開發',  assignee: 3, priority: 'high', startDate: '2026/05/28', dueDate: '2026/06/25', status: 'paused', progress: 35,  desc: '開發活動登陸頁面，串接報名系統與 Google Analytics，目前因設計調整暫停。',           comments: [], attachments: [],           dependencies: [5],   mood: '🔥' },
+    { id: 7, projectId: 3, name: 'APP 需求分析',  assignee: 1, priority: 'mid',  startDate: '2026/06/05', dueDate: '2026/06/30', status: 'active', progress: 10,  desc: '收集並分析 APP 功能需求，訪談利害關係人，產出完整需求規格書。',                     comments: [], attachments: [],           dependencies: [],    mood: null },
   ],
 
   notifications: [
-    { id: 1, type: 'task',     icon: 'bell',     title: '任務指派',     message: '您有一個新任務「需求文件撰寫」已指派給您，截止日期 2026/06/03', time: '10分鐘前', read: false, taskId: 1 },
-    { id: 2, type: 'reminder', icon: 'clock',    title: '任務截止提醒', message: '任務「設計稿確認」截止日期將至 2026/06/10，請盡快完成',          time: '1小時前',  read: false, taskId: 2 },
-    { id: 3, type: 'general',  icon: 'info',     title: '進度更新',     message: '李小美 已將任務「設計稿確認」的進度更新為 15%',                    time: '3小時前',  read: false, taskId: 2 },
-    { id: 4, type: 'system',   icon: 'settings', title: '系統公告',     message: '系統將於 6/15 02:00～04:00 進行維護，請提前儲存工作',              time: '2天前',    read: true,  taskId: null },
-    { id: 5, type: 'task',     icon: 'bell',     title: '任務更新',     message: '前端開發任務進度已更新至 45%',                                      time: '3天前',    read: true,  taskId: 3 },
-    { id: 6, type: 'reminder', icon: 'clock',    title: '專案截止提醒', message: '專案「行銷活動專案」將於 2026/06/30 截止',                          time: '5天前',    read: true,  projectId: 2 },
+    { id: 1, type: 'task',     icon: 'bell',     title: '任務指派',     message: '新任務「後端 API 開發」已指派給您，截止日期 2026/06/07',    time: '10分鐘前', read: false, taskId: 3 },
+    { id: 2, type: 'reminder', icon: 'clock',    title: '任務截止提醒', message: '「後端 API 開發」距截止剩 5 天，目前進度僅 20%，請加緊！', time: '1小時前',  read: false, taskId: 3 },
+    { id: 3, type: 'general',  icon: 'info',     title: '進度更新',     message: '國小強 已將「前端介面開發」進度更新至 45%',                 time: '3小時前',  read: false, taskId: 2 },
+    { id: 4, type: 'system',   icon: 'settings', title: '系統公告',     message: '系統將於 6/15 02:00～04:00 進行維護，請提前儲存工作',      time: '1天前',    read: true,  taskId: null },
+    { id: 5, type: 'reminder', icon: 'clock',    title: '專案截止提醒', message: '專案「行銷活動專案」將於 2026/06/30 截止',                  time: '3天前',    read: true,  projectId: 2 },
   ],
 
   members: [
