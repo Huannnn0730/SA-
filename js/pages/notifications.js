@@ -70,7 +70,8 @@ function readNotif(id) {
     AppState.currentTaskId = n.taskId;
     navigateTo('task-detail');
   } else if (n.projectId) {
-    navigateTo('projects');
+    const isAdmin = AppState.currentUser?.role === 'admin';
+    navigateTo(isAdmin ? 'projects' : 'dashboard');
   } else {
     renderNotifications();
   }

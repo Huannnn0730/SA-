@@ -179,6 +179,7 @@ function checkRiskAlerts() {
         time: '剛剛',
         read: false,
         riskTaskId: t.id,
+        taskId: t.id,
       });
     }
   });

@@ -40,7 +40,6 @@ const AppState = {
     { id: 1, type: 'task',     icon: 'bell',     title: '任務指派',     message: '新任務「後端 API 開發」已指派給您，截止日期 2026/06/07',    time: '10分鐘前', read: false, taskId: 3 },
     { id: 2, type: 'reminder', icon: 'clock',    title: '任務截止提醒', message: '「後端 API 開發」距截止剩 5 天，目前進度僅 20%，請加緊！', time: '1小時前',  read: false, taskId: 3 },
     { id: 3, type: 'general',  icon: 'info',     title: '進度更新',     message: '國小強 已將「前端介面開發」進度更新至 45%',                 time: '3小時前',  read: false, taskId: 2 },
-    { id: 4, type: 'system',   icon: 'settings', title: '系統公告',     message: '系統將於 6/15 02:00～04:00 進行維護，請提前儲存工作',      time: '1天前',    read: true,  taskId: null },
     { id: 5, type: 'reminder', icon: 'clock',    title: '專案截止提醒', message: '專案「行銷活動專案」將於 2026/06/30 截止',                  time: '3天前',    read: true,  projectId: 2 },
   ],
 
