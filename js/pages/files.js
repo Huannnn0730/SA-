@@ -107,7 +107,8 @@ function renderFileRows(files) {
         <span class="text-sm text-gray-500">${f.size}</span>
         <span class="text-sm text-gray-500">${f.date}</span>
         <div class="flex gap-1">
-          <button onclick="showToast('下載中...','info')" class="btn-icon" title="下載">${svgIcon('download', 14)}</button>
+          ${f.dataUrl ? `<button onclick="previewFile(${f.id})" class="btn-icon" title="預覽">${svgIcon('eye', 14)}</button>` : ''}
+          ${f.dataUrl ? `<button onclick="downloadFile(${f.id})" class="btn-icon" title="下載">${svgIcon('download', 14)}</button>` : `<button class="btn-icon" style="opacity:0.3;cursor:not-allowed" title="無法下載（示範資料）">${svgIcon('download', 14)}</button>`}
           <button onclick="deleteFile(${f.id})" class="btn-icon btn-icon-red" title="刪除">${svgIcon('trash', 14)}</button>
         </div>
       </div>`;
@@ -164,22 +165,78 @@ function confirmUpload() {
   const now = new Date();
   const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
   const maxId = AppState.files.reduce((m, f) => Math.max(m, f.id), 0);
-
-  Array.from(input.files).forEach((file, i) => {
-    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
-    AppState.files.push({
-      id: maxId + i + 1,
-      name: file.name,
-      projectId,
-      size: `${sizeMB} MB`,
-      date: dateStr,
-      icon: getFileIcon(file.name),
-    });
-  });
+  const fileArr = Array.from(input.files);
+  let processed = 0;
 
   closeModal();
-  selectedProjectId = projectId;
-  saveAppState();
-  renderFiles();
-  showToast(`已上傳 ${input.files.length} 個檔案`, 'success');
+  showToast('上傳中...', 'info');
+
+  fileArr.forEach((file, i) => {
+    const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        AppState.files.push({
+          id: maxId + i + 1,
+          name: file.name,
+          projectId,
+          size: `${sizeMB} MB`,
+          date: dateStr,
+          icon: getFileIcon(file.name),
+          dataUrl: e.target.result,
+        });
+      } catch(err) {
+        showToast(`${file.name} 太大，無法儲存`, 'error');
+      }
+      processed++;
+      if (processed === fileArr.length) {
+        selectedProjectId = projectId;
+        try {
+          saveAppState();
+        } catch(e) {
+          showToast('儲存失敗：檔案總大小超過上限，請刪除舊檔案', 'error');
+        }
+        renderFiles();
+        showToast(`已上傳 ${fileArr.length} 個檔案`, 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function downloadFile(id) {
+  const f = AppState.files.find(f => f.id === id);
+  if (!f || !f.dataUrl) { showToast('無法下載此檔案', 'error'); return; }
+  const a = document.createElement('a');
+  a.href = f.dataUrl;
+  a.download = f.name;
+  a.click();
+}
+
+function previewFile(id) {
+  const f = AppState.files.find(f => f.id === id);
+  if (!f || !f.dataUrl) { showToast('無法預覽此檔案', 'error'); return; }
+
+  const isImage = ['image'].includes(f.icon);
+  const isPdf   = f.icon === 'pdf';
+
+  let content;
+  if (isImage) {
+    content = `<img src="${f.dataUrl}" style="max-width:100%;max-height:60vh;border-radius:8px;margin:auto;display:block" />`;
+  } else if (isPdf) {
+    content = `<iframe src="${f.dataUrl}" style="width:100%;height:60vh;border:none;border-radius:8px"></iframe>`;
+  } else {
+    content = `
+      <div class="flex flex-col items-center gap-4 py-8 text-center">
+        <div style="font-size:48px">📄</div>
+        <div class="text-gray-600 font-medium">${f.name}</div>
+        <div class="text-sm text-gray-400">此格式不支援線上預覽</div>
+        <button onclick="downloadFile(${f.id})" class="btn btn-primary">${svgIcon('download',16)} 下載檔案</button>
+      </div>`;
+  }
+
+  openModal(modalShell(f.name, content,
+    `<button onclick="closeModal()" class="btn btn-secondary">關閉</button>
+     ${f.dataUrl ? `<button onclick="downloadFile(${f.id})" class="btn btn-primary">${svgIcon('download',16)} 下載</button>` : ''}`
+  ));
 }
