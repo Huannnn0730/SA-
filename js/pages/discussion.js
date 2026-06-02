@@ -5,8 +5,13 @@
 let selectedDiscussionTask = null;
 
 function renderDiscussion() {
-  // Group discussions by task
-  const taskIds = [...new Set(AppState.discussions.map(d => d.taskId))];
+  const u = AppState.currentUser;
+  const myTaskIds = u.role === 'admin'
+    ? null
+    : new Set(AppState.tasks.filter(t => t.assignee === u.id).map(t => t.id));
+  // Group discussions by task (filter by user's tasks for executors)
+  const taskIds = [...new Set(AppState.discussions.map(d => d.taskId))]
+    .filter(tid => !myTaskIds || myTaskIds.has(tid));
   const threads = taskIds.map(tid => {
     const task = AppState.tasks.find(t => t.id === tid);
     const msgs = AppState.getDiscussionsByTask(tid);

@@ -45,6 +45,19 @@ function renderCalendar() {
     </div>`;
 }
 
+function getMyCalendarEvents() {
+  const u = AppState.currentUser;
+  const tasks = u.role === 'admin' ? AppState.tasks : AppState.tasks.filter(t => t.assignee === u.id);
+  const events = {};
+  tasks.forEach(t => {
+    if (!t.dueDate || t.dueDate === '—') return;
+    const key = t.dueDate.replace(/\//g, '-');
+    if (!events[key]) events[key] = [];
+    events[key].push(t.name);
+  });
+  return events;
+}
+
 function renderCalGrid() {
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
@@ -52,14 +65,14 @@ function renderCalGrid() {
   const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
 
   let cells = '';
-  // Empty cells before first day
   for (let i = 0; i < firstDay; i++) {
     cells += `<div class="calendar-day text-gray-200 cursor-default">${new Date(calYear, calMonth, -firstDay + i + 1).getDate()}</div>`;
   }
 
+  const myEvents = getMyCalendarEvents();
   for (let d = 1; d <= daysInMonth; d++) {
     const dateKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const hasEvent = !!AppState.getCalendarEvents()[dateKey];
+    const hasEvent = !!myEvents[dateKey];
     const isToday = isCurrentMonth && d === today.getDate();
     cells += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}" onclick="showCalDayEvents('${dateKey}', ${d})">${d}</div>`;
   }
@@ -68,7 +81,7 @@ function renderCalGrid() {
 }
 
 function renderAllCalEvents() {
-  const events = Object.entries(AppState.getCalendarEvents()).filter(([k]) => {
+  const events = Object.entries(getMyCalendarEvents()).filter(([k]) => {
     const [y, m] = k.split('-').map(Number);
     return y === calYear && m === calMonth + 1;
   });
@@ -85,7 +98,7 @@ function renderAllCalEvents() {
 }
 
 function showCalDayEvents(dateKey, day) {
-  const events = AppState.getCalendarEvents()[dateKey];
+  const events = getMyCalendarEvents()[dateKey];
   if (!events) return;
   const content = `
     <h4 class="font-semibold text-gray-700 text-sm mb-3">${calMonth+1}/${day} 任務事件</h4>
