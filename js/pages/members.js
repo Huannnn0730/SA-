@@ -39,7 +39,7 @@ function renderMemberRows() {
       <td><span class="badge ${m.role === 'admin' ? 'badge-blue' : 'badge-green'}">${AppState.roleLabel(m.role)}</span></td>
       <td>
         <div class="flex items-center gap-2">
-          <span class="font-semibold text-blue-600">${m.activeTasks}</span>
+          <span class="font-semibold text-blue-600">${AppState.tasks.filter(t => t.assignee === m.id && t.status !== 'done').length}</span>
           <span class="text-gray-400 text-sm">個任務</span>
         </div>
       </td>
