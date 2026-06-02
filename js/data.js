@@ -44,11 +44,11 @@ const AppState = {
   ],
 
   members: [
-    { id: 1, name: '專案經理A', title: '專案經理',  role: 'admin',    activeTasks: 3 },
-    { id: 2, name: '設計師A',   title: '設計師',    role: 'executor', activeTasks: 4 },
-    { id: 3, name: '前端工程師A', title: '前端工程師', role: 'executor', activeTasks: 5 },
-    { id: 4, name: '後端工程師A', title: '後端工程師', role: 'executor', activeTasks: 3 },
-    { id: 5, name: '測試工程師A', title: '測試工程師', role: 'executor', activeTasks: 2 },
+    { id: 1, name: '專案經理A',  title: '專案經理',   role: 'admin'    },
+    { id: 2, name: '設計師A',    title: '設計師',     role: 'executor' },
+    { id: 3, name: '前端工程師A', title: '前端工程師', role: 'executor' },
+    { id: 4, name: '後端工程師A', title: '後端工程師', role: 'executor' },
+    { id: 5, name: '測試工程師A', title: '測試工程師', role: 'executor' },
   ],
 
   files: [
@@ -73,6 +73,11 @@ const AppState = {
   getTasksByUser(userId) { return this.tasks.filter(t => t.assignee === userId); },
   getTasksByProject(projectId) { return this.tasks.filter(t => t.projectId === projectId); },
   getDiscussionsByTask(taskId) { return this.discussions.filter(d => d.taskId === taskId); },
+  getProjectProgress(projectId) {
+    const ts = this.tasks.filter(t => t.projectId === projectId);
+    if (!ts.length) return 0;
+    return Math.round(ts.filter(t => t.status === 'done').length / ts.length * 100);
+  },
 
   // Computed: calendar events from task due dates (getter alias for backward compat)
   get calendarEvents() { return this.getCalendarEvents(); },

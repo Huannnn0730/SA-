@@ -86,7 +86,7 @@ function addMember() {
   if (AppState.users.find(u => u.email === email)) { showToast('此 Email 已存在', 'error'); return; }
   const id = AppState.users.length + 1;
   AppState.users.push({ id, name, email, password, role, title, phone: '', avatar: name.slice(0,2) });
-  AppState.members.push({ id, name, title, role, activeTasks: 0 });
+  AppState.members.push({ id, name, title, role });
   closeModal();
   document.getElementById('members-tbody').innerHTML = renderMemberRows();
   saveAppState();

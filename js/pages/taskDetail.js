@@ -171,8 +171,8 @@ function renderTaskDetail() {
           <div class="card">
             <h3 class="font-bold text-gray-800 mb-3">專案進度</h3>
             <div class="text-sm text-gray-600 mb-2">${proj.name}</div>
-            ${progressBar(proj.progress, 'progress-blue', 8)}
-            <div class="text-right text-xs text-blue-600 font-semibold mt-1">${proj.progress}%</div>
+            ${progressBar(AppState.getProjectProgress(proj.id), 'progress-blue', 8)}
+            <div class="text-right text-xs text-blue-600 font-semibold mt-1">${AppState.getProjectProgress(proj.id)}%</div>
           </div>` : ''}
         </div>
       </div>

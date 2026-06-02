@@ -118,8 +118,8 @@ function renderOverviewTab() {
                 <td><span class="badge ${AppState.statusBadge(p.status)}">${AppState.statusLabel(p.status)}</span></td>
                 <td style="min-width:180px">
                   <div class="flex items-center gap-2">
-                    <div class="flex-1">${progressBar(p.progress, 'progress-blue')}</div>
-                    <span class="text-sm font-semibold text-gray-600">${p.progress}%</span>
+                    <div class="flex-1">${progressBar(AppState.getProjectProgress(p.id), 'progress-blue')}</div>
+                    <span class="text-sm font-semibold text-gray-600">${AppState.getProjectProgress(p.id)}%</span>
                   </div>
                 </td>
                 <td class="text-gray-500">${pTasks.length} 個</td>

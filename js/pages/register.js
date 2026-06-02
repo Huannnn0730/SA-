@@ -99,7 +99,7 @@ function handleRegister() {
     avatar: name.slice(0, 2),
   };
   AppState.users.push(newUser);
-  AppState.members.push({ id: newUser.id, name, title: newUser.title, role: newUser.role, activeTasks: 0 });
+  AppState.members.push({ id: newUser.id, name, title: newUser.title, role: newUser.role });
   saveAppState();
   showToast('註冊成功！請登入', 'success');
   navigateAuth('login');

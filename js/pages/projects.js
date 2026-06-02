@@ -40,8 +40,8 @@ function renderProjectRows() {
       <td class="text-gray-500">${p.endDate}</td>
       <td style="min-width:140px">
         <div class="flex items-center gap-2">
-          <div class="flex-1">${progressBar(p.progress, p.progress >= 100 ? 'progress-green' : p.progress >= 50 ? 'progress-blue' : 'progress-orange')}</div>
-          <span class="text-xs font-semibold text-gray-600">${p.progress}%</span>
+          <div class="flex-1">${progressBar(AppState.getProjectProgress(p.id), AppState.getProjectProgress(p.id) >= 100 ? 'progress-green' : AppState.getProjectProgress(p.id) >= 50 ? 'progress-blue' : 'progress-orange')}</div>
+          <span class="text-xs font-semibold text-gray-600">${AppState.getProjectProgress(p.id)}%</span>
         </div>
       </td>
       <td>
@@ -108,8 +108,11 @@ function openEditProjectModal(id) {
           </select>
         </div>
         <div>
-          <label class="form-label">進度 (${p.progress}%)</label>
-          <input id="edit-proj-progress" type="range" min="0" max="100" value="${p.progress}" class="w-full mt-3" oninput="this.previousElementSibling&&(this.previousElementSibling.textContent='進度 ('+this.value+'%)')" />
+          <label class="form-label">目前進度</label>
+          <div class="flex items-center gap-2 mt-2">
+            ${progressBar(AppState.getProjectProgress(p.id), 'progress-blue', 8)}
+            <span class="text-sm font-semibold text-blue-600 flex-shrink-0">${AppState.getProjectProgress(p.id)}%（依任務完成率自動計算）</span>
+          </div>
         </div>
       </div>
     </div>`,
@@ -127,7 +130,6 @@ function saveProject(id) {
   if (s) p.startDate = s.replace(/-/g, '/');
   if (e) p.endDate = e.replace(/-/g, '/');
   p.status = document.getElementById('edit-proj-status').value;
-  p.progress = parseInt(document.getElementById('edit-proj-progress').value);
   closeModal();
   document.getElementById('projects-tbody').innerHTML = renderProjectRows();
   saveAppState();
@@ -179,8 +181,8 @@ function openProjectDetail(id) {
       <span class="text-xs text-gray-400">${p.startDate} ～ ${p.endDate}</span>
     </div>
     <div class="flex items-center gap-2 mb-5">
-      <div class="flex-1">${progressBar(p.progress, p.progress >= 100 ? 'progress-green' : p.progress >= 50 ? 'progress-blue' : 'progress-orange', 10)}</div>
-      <span class="text-sm font-bold text-gray-700">${p.progress}%</span>
+      <div class="flex-1">${progressBar(AppState.getProjectProgress(p.id), AppState.getProjectProgress(p.id) >= 100 ? 'progress-green' : AppState.getProjectProgress(p.id) >= 50 ? 'progress-blue' : 'progress-orange', 10)}</div>
+      <span class="text-sm font-bold text-gray-700">${AppState.getProjectProgress(p.id)}%</span>
     </div>
     <div class="flex gap-4 text-sm text-gray-500 mb-5">
       <span>共 <strong class="text-gray-800">${tasks.length}</strong> 個任務</span>
