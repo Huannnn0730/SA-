@@ -29,6 +29,15 @@ function renderNotifications() {
             <button class="tab-btn ${i === 0 ? 'active' : ''}" onclick="filterNotifs(this, '${['all','task','reminder','general','system'][i]}')">${t}</button>`).join('')}
         </div>
 
+        <!-- Risk criteria hint -->
+        <div class="mb-4 rounded-lg px-4 py-3 text-xs text-gray-500" style="background:#f8fafc;border:1px solid #e2e8f0">
+          <div class="font-semibold text-gray-600 mb-1">⚡ 風險自動偵測標準</div>
+          <div class="flex flex-wrap gap-x-6 gap-y-1">
+            <span>🔴 <b>高風險</b>：已逾期，或距截止 ≤ 1 天且進度 &lt; 30%</span>
+            <span>🟡 <b>中風險</b>：距截止 2–3 天且進度 &lt; 30%</span>
+          </div>
+        </div>
+
         <!-- Notifications list -->
         <div id="notif-list">
           ${notifs.map(n => `
