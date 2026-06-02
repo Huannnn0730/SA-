@@ -20,12 +20,25 @@ function renderDiscussion() {
     return { tid, task, msgs, lastMsg, unread };
   });
 
-  if (!selectedDiscussionTask && threads.length > 0) {
+  if (threads.length === 0) {
+    selectedDiscussionTask = null;
+  } else if (!selectedDiscussionTask || !threads.find(t => t.tid === selectedDiscussionTask)) {
     selectedDiscussionTask = threads[0].tid;
   }
 
   const activeThread = threads.find(t => t.tid === selectedDiscussionTask);
   const u = AppState.currentUser;
+
+  if (threads.length === 0) {
+    document.getElementById('page-container').innerHTML = `
+      <div class="page-enter">
+        <div class="card flex flex-col items-center justify-center py-20 text-center">
+          ${svgIcon('message', 48)}
+          <div class="mt-4 text-gray-400 text-sm">目前沒有相關任務的討論</div>
+        </div>
+      </div>`;
+    return;
+  }
 
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter">

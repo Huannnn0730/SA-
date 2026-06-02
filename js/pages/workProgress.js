@@ -37,17 +37,14 @@ function renderWorkProgress() {
         <div class="card text-center">
           <div class="text-4xl font-black text-blue-600 mb-1">${rate}%</div>
           <div class="text-sm text-gray-500">本月完成率</div>
-          <div class="text-xs text-green-600 mt-1 font-medium">↑15% 較上月</div>
         </div>
         <div class="card text-center">
           <div class="text-4xl font-black text-green-600 mb-1">${done}</div>
           <div class="text-sm text-gray-500">已完成任務</div>
-          <div class="text-xs text-red-500 mt-1 font-medium">↓3 較上月</div>
         </div>
         <div class="card text-center">
           <div class="text-4xl font-black text-orange-500 mb-1">${active + pending}</div>
           <div class="text-sm text-gray-500">待完成任務</div>
-          <div class="text-xs text-red-500 mt-1 font-medium">↓1 較上月</div>
         </div>
       </div>
 
