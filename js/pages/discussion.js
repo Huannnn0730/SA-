@@ -27,7 +27,6 @@ function renderDiscussion() {
   }
 
   const activeThread = threads.find(t => t.tid === selectedDiscussionTask);
-  const u = AppState.currentUser;
 
   if (threads.length === 0) {
     document.getElementById('page-container').innerHTML = `
