@@ -79,7 +79,7 @@ function renderOverviewTab() {
                   </div>
                   <span class="font-semibold text-gray-800">${d.value}</span>
                 </div>
-                ${progressBar(Math.round(d.value / totalTasks * 100), '', 5)}
+                ${progressBar(totalTasks > 0 ? Math.round(d.value / totalTasks * 100) : 0, '', 5)}
               </div>`).join('')}
           </div>
         </div>
@@ -135,17 +135,17 @@ function renderOverviewTab() {
 // ── UC41 Heatmap Tab ───────────────────────────────────────
 
 function renderHeatmapTab() {
-  // Generate date range: past 4 weeks (28 days)
+  // Generate date range: past 2 weeks to future 2 weeks (28 days)
   const days = [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  for (let i = 27; i >= 0; i--) {
+  for (let i = -14; i <= 13; i++) {
     const d = new Date(today);
-    d.setDate(today.getDate() - i);
+    d.setDate(today.getDate() + i);
     days.push(d);
   }
 
-  const members = AppState.members;
+  const members = AppState.members.filter(m => m.role !== 'admin');
 
   // Calculate load per member per day (tasks whose dueDate falls in that week)
   function getLoad(memberId, day) {
@@ -230,7 +230,7 @@ function renderHeatmapTab() {
       <div class="flex flex-wrap items-start justify-between gap-3 mb-2">
         <div>
           <h3 class="font-bold text-gray-800 mb-1">資源負載熱力圖</h3>
-          <p class="text-sm text-gray-400">顯示每位成員過去 4 週的每日任務密度，深色代表超載</p>
+          <p class="text-sm text-gray-400">顯示過去 2 週至未來 2 週的每日任務密度，深色代表超載</p>
         </div>
         <div class="flex items-center gap-2 text-xs text-gray-400 flex-shrink-0">
           <span>空閒</span>

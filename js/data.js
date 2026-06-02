@@ -98,19 +98,16 @@ const AppState = {
     const parseDate = s => { const d = new Date(s.replace(/\//g, '-')); d.setHours(0,0,0,0); return d; };
 
     const total = this.tasks.length;
-    const done = this.tasks.filter(t => t.status === 'done').length;
-    const active = this.tasks.filter(t => t.status === 'active').length;
-    const pending = this.tasks.filter(t => t.status === 'pending').length;
-    const paused = this.tasks.filter(t => t.status === 'paused').length;
-    const overdue = this.tasks.filter(t => {
-      if (t.status === 'done') return false;
-      if (!t.dueDate || t.dueDate === '—') return false;
-      return parseDate(t.dueDate) < today;
-    }).length;
+    const isOverdue = t => t.status !== 'done' && t.dueDate && t.dueDate !== '—' && parseDate(t.dueDate) < today;
+    const done    = this.tasks.filter(t => t.status === 'done').length;
+    const overdue = this.tasks.filter(isOverdue).length;
+    const active  = this.tasks.filter(t => t.status === 'active'  && !isOverdue(t)).length;
+    const pending = this.tasks.filter(t => t.status === 'pending' && !isOverdue(t)).length;
+    const paused  = this.tasks.filter(t => t.status === 'paused'  && !isOverdue(t)).length;
 
     const completionRate = total > 0 ? Math.round(done / total * 100) : 0;
 
-    const taskData = this.members.map(m => ({
+    const taskData = this.members.filter(m => m.role !== 'admin').map(m => ({
       name: m.name,
       value: this.tasks.filter(t => t.assignee === m.id && t.status !== 'done').length,
     }));
@@ -122,6 +119,7 @@ const AppState = {
         { label: '已完成', value: done,    color: '#22c55e' },
         { label: '進行中', value: active,  color: '#3b82f6' },
         { label: '未開始', value: pending, color: '#94a3b8' },
+        { label: '暫停中', value: paused,  color: '#f59e0b' },
         { label: '逾期',   value: overdue, color: '#ef4444' },
       ],
       taskData,
