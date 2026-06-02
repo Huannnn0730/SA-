@@ -223,12 +223,16 @@ function openAddTaskModal() {
           </select>
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-3 gap-3">
         <div>
           <label class="form-label">優先度</label>
           <select id="tk-priority" class="form-input form-select">
             <option value="high">高</option><option value="mid" selected>中</option><option value="low">低</option>
           </select>
+        </div>
+        <div>
+          <label class="form-label">開始日期</label>
+          <input id="tk-start" type="date" class="form-input" />
         </div>
         <div>
           <label class="form-label">截止日期</label>
@@ -248,6 +252,7 @@ function openAddTaskModal() {
 function addTask() {
   const name = document.getElementById('tk-name').value.trim();
   if (!name) { showToast('請輸入任務名稱', 'error'); return; }
+  const startRaw = document.getElementById('tk-start').value;
   const dueRaw = document.getElementById('tk-due').value;
   AppState.tasks.push({
     id: AppState.tasks.length + 1,
@@ -255,6 +260,7 @@ function addTask() {
     projectId: parseInt(document.getElementById('tk-project').value),
     assignee: parseInt(document.getElementById('tk-assignee').value),
     priority: document.getElementById('tk-priority').value,
+    startDate: startRaw ? startRaw.replace(/-/g, '/') : null,
     dueDate: dueRaw ? dueRaw.replace(/-/g, '/') : '—',
     status: 'pending',
     progress: 0,

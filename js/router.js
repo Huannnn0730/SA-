@@ -35,6 +35,11 @@ function navigateTo(page) {
   }
   AppState.currentPage = page;
   window.location.hash = '#' + page;
+  if (page === 'task-detail') {
+    sessionStorage.setItem('currentTaskId', AppState.currentTaskId);
+  } else {
+    sessionStorage.removeItem('currentTaskId');
+  }
   renderPage(page);
 }
 

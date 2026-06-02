@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (u) AppState.currentUser = u;
   }
 
+  // Restore currentTaskId
+  const savedTaskId = sessionStorage.getItem('currentTaskId');
+  if (savedTaskId) AppState.currentTaskId = parseInt(savedTaskId);
+
   // Read initial hash
   const hash = window.location.hash.replace('#', '');
   const startPage = hash && routes[hash] ? hash : 'login';
