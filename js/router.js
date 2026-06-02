@@ -96,6 +96,7 @@ function hideApp() {
 
 function logout() {
   AppState.currentUser = null;
+  sessionStorage.removeItem('userId');
   AppState.currentPage = 'login';
   hideApp();
   renderLogin();

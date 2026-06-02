@@ -3,10 +3,16 @@
 // ============================================================
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Restore session from sessionStorage
+  const savedId = sessionStorage.getItem('userId');
+  if (savedId) {
+    const u = AppState.users.find(u => u.id === parseInt(savedId));
+    if (u) AppState.currentUser = u;
+  }
+
   // Read initial hash
   const hash = window.location.hash.replace('#', '');
   const startPage = hash && routes[hash] ? hash : 'login';
-
   AppState.currentPage = startPage;
 
   const authPages = ['login', 'register', 'forgot'];

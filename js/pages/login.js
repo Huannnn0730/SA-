@@ -62,6 +62,7 @@ function handleLogin() {
   const user = AppState.users.find(u => u.email === email && u.password === password);
   if (!user) { showToast('帳號或密碼錯誤', 'error'); return; }
   AppState.currentUser = user;
+  sessionStorage.setItem('userId', user.id);
   showApp();
   navigateTo('dashboard');
   showToast(`歡迎回來，${user.name}！`, 'success');
