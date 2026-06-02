@@ -155,7 +155,12 @@ body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
     box-shadow: 4px 0 24px rgba(0,0,0,0.12);
   }
   .sidebar-panel.sidebar-open { transform: translateX(0); }
-  .modal-box { min-width: 320px; }
+  .modal-box { min-width: unset; width: calc(100vw - 32px); padding: 20px; }
+  .stat-card { padding: 14px; }
+  .stat-card .stat-icon { width: 36px !important; height: 36px !important; }
+  .card { padding: 14px; }
+  .data-table th, .data-table td { padding: 8px 10px; }
+  .gantt-label { width: 110px; font-size: 11px; }
 }
 
 @media (min-width: 769px) {

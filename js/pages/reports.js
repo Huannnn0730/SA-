@@ -227,12 +227,12 @@ function renderHeatmapTab() {
 
   return `
     <div class="card mb-4">
-      <div class="flex items-start justify-between mb-2">
+      <div class="flex flex-wrap items-start justify-between gap-3 mb-2">
         <div>
           <h3 class="font-bold text-gray-800 mb-1">資源負載熱力圖</h3>
           <p class="text-sm text-gray-400">顯示每位成員過去 4 週的每日任務密度，深色代表超載</p>
         </div>
-        <div class="flex items-center gap-2 text-xs text-gray-400">
+        <div class="flex items-center gap-2 text-xs text-gray-400 flex-shrink-0">
           <span>空閒</span>
           ${['#f8fafc','#bfdbfe','#60a5fa','#2563eb','#1e3a8a'].map(c =>
             `<span style="width:18px;height:18px;border-radius:4px;background:${c};display:inline-block;border:1px solid #e2e8f0"></span>`

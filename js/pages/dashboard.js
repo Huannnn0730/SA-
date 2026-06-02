@@ -177,14 +177,14 @@ function renderRiskPanel() {
 
 function statCard(label, value, bg, color, icon, trend, up) {
   return `
-    <div class="stat-card flex items-center gap-4">
-      <div style="width:48px;height:48px;background:${bg};border-radius:12px;display:flex;align-items:center;justify-content:center;color:${color};flex-shrink:0">
-        ${svgIcon(icon, 22)}
+    <div class="stat-card flex items-center gap-3">
+      <div class="stat-icon" style="width:44px;height:44px;background:${bg};border-radius:12px;display:flex;align-items:center;justify-content:center;color:${color};flex-shrink:0">
+        ${svgIcon(icon, 20)}
       </div>
-      <div class="flex-1">
-        <div class="text-2xl font-bold text-gray-800">${value}</div>
-        <div class="text-sm text-gray-500">${label}</div>
-        <div class="text-xs mt-1 font-medium" style="color:${up ? '#15803d' : '#b91c1c'}">${trend} 較上月</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-xl font-bold text-gray-800 leading-tight">${value}</div>
+        <div class="text-xs text-gray-500 truncate">${label}</div>
+        <div class="text-xs mt-0.5 font-medium" style="color:${up ? '#15803d' : '#b91c1c'}">${trend}</div>
       </div>
     </div>`;
 }

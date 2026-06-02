@@ -9,9 +9,9 @@ function renderTasks() {
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter">
       <div class="card">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
           <h2 class="font-bold text-gray-800 text-lg">任務管理</h2>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 flex-shrink-0">
             <!-- View Toggle -->
             <div class="flex rounded-lg border border-gray-200 overflow-hidden">
               <button id="view-list" onclick="switchTaskView('list')"
