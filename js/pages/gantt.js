@@ -72,7 +72,7 @@ function renderGantt() {
         <div style="position:absolute;left:${barLeft}px;top:9px;width:${barWidth}px;min-width:4px;height:22px;background:${color};border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:10px;color:white;overflow:hidden;cursor:pointer"
              onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')">
           ${t.progress > 0 ? `<div style="position:absolute;left:0;top:0;height:100%;width:${t.progress}%;background:rgba(0,0,0,0.18);border-radius:4px 0 0 4px;pointer-events:none"></div>` : ''}
-          ${barWidth > 40 ? `<span style="position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</span>` : ''}
+          ${barWidth > 40 ? `<span style="position:relative;z-index:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</span>` : `<span style="position:absolute;left:${barWidth+8}px;top:50%;transform:translateY(-50%);white-space:nowrap;color:#374151;font-size:10px;pointer-events:none">${t.name}</span>`}
         </div>
       </td>
     </tr>`;

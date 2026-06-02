@@ -262,7 +262,12 @@ function addTask() {
     priority: document.getElementById('tk-priority').value,
     startDate: startRaw ? startRaw.replace(/-/g, '/') : null,
     dueDate: dueRaw ? dueRaw.replace(/-/g, '/') : '—',
-    status: 'pending',
+    status: (() => {
+      if (!startRaw) return 'pending';
+      const start = new Date(startRaw); start.setHours(0,0,0,0);
+      const now = new Date(); now.setHours(0,0,0,0);
+      return start <= now ? 'active' : 'pending';
+    })(),
     progress: 0,
     desc: document.getElementById('tk-desc').value,
     comments: [], attachments: [],

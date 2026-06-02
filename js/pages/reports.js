@@ -49,12 +49,10 @@ function renderOverviewTab() {
       <div class="card text-center">
         <div class="text-4xl font-black text-blue-600 mb-1">${rd.completionRate}%</div>
         <div class="text-sm text-gray-500">任務完成率</div>
-        <div class="text-xs text-green-600 mt-1 font-medium">↑10% 較上月</div>
       </div>
       <div class="card text-center">
         <div class="text-4xl font-black text-red-500 mb-1">${rd.overdueTasks}</div>
         <div class="text-sm text-gray-500">逾期任務</div>
-        <div class="text-xs text-red-500 mt-1 font-medium">↑2 較上月</div>
       </div>
       <div class="card text-center">
         <div class="text-4xl font-black text-purple-600 mb-1">${AppState.tasks.length}</div>
@@ -232,12 +230,18 @@ function renderHeatmapTab() {
           <h3 class="font-bold text-gray-800 mb-1">資源負載熱力圖</h3>
           <p class="text-sm text-gray-400">顯示過去 2 週至未來 2 週的每日任務密度，深色代表超載</p>
         </div>
-        <div class="flex items-center gap-2 text-xs text-gray-400 flex-shrink-0">
-          <span>空閒</span>
-          ${['#f8fafc','#bfdbfe','#60a5fa','#2563eb','#1e3a8a'].map(c =>
-            `<span style="width:18px;height:18px;border-radius:4px;background:${c};display:inline-block;border:1px solid #e2e8f0"></span>`
-          ).join('')}
-          <span>超載</span>
+        <div class="flex items-center gap-3 text-xs text-gray-400 flex-shrink-0 flex-wrap">
+          ${[
+            { color:'#f8fafc', label:'空閒', range:'0' },
+            { color:'#bfdbfe', label:'輕鬆', range:'1' },
+            { color:'#60a5fa', label:'適中', range:'2' },
+            { color:'#2563eb', label:'繁忙', range:'3' },
+            { color:'#1e3a8a', label:'超載', range:'4+' },
+          ].map(item => `
+            <div class="flex items-center gap-1">
+              <span style="width:16px;height:16px;border-radius:3px;background:${item.color};display:inline-block;border:1px solid #e2e8f0;flex-shrink:0"></span>
+              <span>${item.label}（${item.range}）</span>
+            </div>`).join('')}
         </div>
       </div>
 

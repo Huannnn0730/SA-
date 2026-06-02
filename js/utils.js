@@ -198,7 +198,7 @@ function loadAppState() {
 function checkRiskAlerts() {
   const risks = getRiskTasks();
   risks.forEach(t => {
-    const exists = AppState.notifications.some(n => n.riskTaskId === t.id && !n.read);
+    const exists = AppState.notifications.some(n => n.riskTaskId === t.id);
     if (!exists) {
       const assignee = AppState.getUser(t.assignee);
       AppState.notifications.unshift({
