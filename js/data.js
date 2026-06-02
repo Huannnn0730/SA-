@@ -8,11 +8,11 @@ const AppState = {
   sidebarCollapsed: false,
 
   users: [
-    { id: 1, name: '王小明', email: 'wang@example.com', password: '123456', role: 'admin',  title: '專案經理', phone: '0912-345-678', avatar: 'WM' },
-    { id: 2, name: '李小美', email: 'li@example.com',   password: '123456', role: 'executor', title: '設計師',   phone: '0987-654-321', avatar: 'LM' },
-    { id: 3, name: '國小強', email: 'guo@example.com',  password: '123456', role: 'executor', title: '前端工程師', phone: '0922-111-222', avatar: 'GQ' },
-    { id: 4, name: '陳大文', email: 'chen@example.com', password: '123456', role: 'executor', title: '後端工程師', phone: '0933-444-555', avatar: 'CW' },
-    { id: 5, name: '張小紅', email: 'zhang@example.com',password: '123456', role: 'executor', title: '測試工程師', phone: '0944-666-777', avatar: 'ZR' },
+    { id: 1, name: '專案經理A', email: 'wang@example.com',  password: '123456', role: 'admin',    title: '專案經理',  phone: '0912-345-678', avatar: 'PM' },
+    { id: 2, name: '設計師A',   email: 'li@example.com',    password: '123456', role: 'executor', title: '設計師',    phone: '0987-654-321', avatar: 'DS' },
+    { id: 3, name: '前端工程師A', email: 'guo@example.com', password: '123456', role: 'executor', title: '前端工程師', phone: '0922-111-222', avatar: 'FE' },
+    { id: 4, name: '後端工程師A', email: 'chen@example.com',password: '123456', role: 'executor', title: '後端工程師', phone: '0933-444-555', avatar: 'BE' },
+    { id: 5, name: '測試工程師A', email: 'zhang@example.com',password: '123456', role: 'executor', title: '測試工程師', phone: '0944-666-777', avatar: 'QA' },
   ],
 
   projects: [
@@ -39,16 +39,16 @@ const AppState = {
   notifications: [
     { id: 1, type: 'task',     icon: 'bell',     title: '任務指派',     message: '新任務「後端 API 開發」已指派給您，截止日期 2026/06/07',    time: '10分鐘前', read: false, taskId: 3 },
     { id: 2, type: 'reminder', icon: 'clock',    title: '任務截止提醒', message: '「後端 API 開發」距截止剩 5 天，目前進度僅 20%，請加緊！', time: '1小時前',  read: false, taskId: 3 },
-    { id: 3, type: 'general',  icon: 'info',     title: '進度更新',     message: '國小強 已將「前端介面開發」進度更新至 45%',                 time: '3小時前',  read: false, taskId: 2 },
+    { id: 3, type: 'general',  icon: 'info',     title: '進度更新',     message: '前端工程師A 已將「前端介面開發」進度更新至 45%',           time: '3小時前',  read: false, taskId: 2 },
     { id: 5, type: 'reminder', icon: 'clock',    title: '專案截止提醒', message: '專案「行銷活動專案」將於 2026/06/30 截止',                  time: '3天前',    read: true,  projectId: 2 },
   ],
 
   members: [
-    { id: 1, name: '王小明', title: '專案經理',  role: 'admin',    activeTasks: 3 },
-    { id: 2, name: '李小美', title: '設計師',    role: 'executor', activeTasks: 4 },
-    { id: 3, name: '國小強', title: '前端工程師', role: 'executor', activeTasks: 5 },
-    { id: 4, name: '陳大文', title: '後端工程師', role: 'executor', activeTasks: 3 },
-    { id: 5, name: '張小紅', title: '測試工程師', role: 'executor', activeTasks: 2 },
+    { id: 1, name: '專案經理A', title: '專案經理',  role: 'admin',    activeTasks: 3 },
+    { id: 2, name: '設計師A',   title: '設計師',    role: 'executor', activeTasks: 4 },
+    { id: 3, name: '前端工程師A', title: '前端工程師', role: 'executor', activeTasks: 5 },
+    { id: 4, name: '後端工程師A', title: '後端工程師', role: 'executor', activeTasks: 3 },
+    { id: 5, name: '測試工程師A', title: '測試工程師', role: 'executor', activeTasks: 2 },
   ],
 
   files: [
