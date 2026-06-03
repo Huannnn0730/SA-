@@ -122,6 +122,10 @@ function saveProfile() {
   u.title = document.getElementById('prof-title').value.trim();
   u.phone = document.getElementById('prof-phone').value.trim();
   u.avatar = u.name.slice(0, 2);
+  // 同步更新 members 清單中的姓名
+  const m = AppState.members.find(m => m.id === u.id);
+  if (m) { m.name = u.name; m.title = u.title; }
+  saveAppState();
   renderSidebar();
   renderHeader();
   renderProfile();
@@ -137,6 +141,7 @@ function changePassword() {
   if (newPwd.length < 6) { showToast('新密碼至少需要6個字元', 'error'); return; }
   if (newPwd !== confirm) { showToast('兩次密碼不符', 'error'); return; }
   u.password = newPwd;
+  saveAppState();
   showToast('密碼更新成功', 'success');
   document.getElementById('pwd-current').value = '';
   document.getElementById('pwd-new').value = '';

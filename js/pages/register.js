@@ -92,7 +92,7 @@ function handleRegister() {
   if (AppState.users.find(u => u.email === email)) { showToast('此 Email 已被使用', 'error'); return; }
 
   const newUser = {
-    id: AppState.users.length + 1,
+    id: Math.max(0, ...AppState.users.map(u => u.id)) + 1,
     name, email, password: pwd, role: role || 'executor',
     title: role === 'admin' ? '專案經理' : '執行人員',
     phone: '',
