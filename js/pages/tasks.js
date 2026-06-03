@@ -279,6 +279,27 @@ function addTask() {
     dependencies: [],
     mood: null,
   });
+  // 產生任務指派通知
+  const assigneeId = parseInt(document.getElementById('tk-assignee').value);
+  const assigneeUser = AppState.users.find(u => u.id === assigneeId);
+  if (assigneeUser) {
+    const newTask = AppState.tasks[AppState.tasks.length - 1];
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    AppState.notifications.unshift({
+      id: Date.now(),
+      type: 'task',
+      icon: 'bell',
+      title: '任務指派',
+      message: `任務「${name}」已指派給 ${assigneeUser.name}，截止日期 ${newTask.dueDate}`,
+      time: '剛剛',
+      read: false,
+      taskId: newTask.id,
+      assigneeId: assigneeId,
+    });
+    updateNotifBadge();
+  }
+
   closeModal();
   refreshTaskView();
   saveAppState();
