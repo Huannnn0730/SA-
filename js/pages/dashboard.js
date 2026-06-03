@@ -44,9 +44,6 @@ function renderDashboard() {
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter flex flex-col gap-6">
 
-      <!-- 系統特色亮點 -->
-      ${renderFeatureHighlights(isAdmin)}
-
       <!-- Stat cards -->
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         ${statCard(isAdmin ? '專案總數' : '參與專案', totalProjects, '#dbeafe', '#2563eb', 'folder', '', true)}
@@ -138,80 +135,6 @@ function renderDashboard() {
         </div>
       </div>
 
-    </div>`;
-}
-
-function renderFeatureHighlights(isAdmin) {
-  const features = [
-    {
-      icon: '🤖',
-      title: '自動化風險偵測',
-      desc: '依截止日與進度自動計算高/中風險，主動推播警示',
-      diff: '市面多數工具需手動標記風險',
-      color: '#fee2e2', border: '#fca5a5', titleColor: '#b91c1c',
-    },
-    {
-      icon: '🎭',
-      title: '任務心情回饋',
-      desc: '執行人員回報工作狀態（順利／壓力／困難），管理者唯讀掌握團隊情緒',
-      diff: '一般 PM 工具無此功能',
-      color: '#fdf4ff', border: '#e9d5ff', titleColor: '#7c3aed',
-    },
-    {
-      icon: '📡',
-      title: '跨分頁即時同步',
-      desc: '兩個帳號同時登入，管理者操作後執行人員頁面立即更新',
-      diff: '傳統工具需後端 WebSocket，本系統用 localStorage 事件實現',
-      color: '#eff6ff', border: '#bfdbfe', titleColor: '#1d4ed8',
-    },
-    {
-      icon: '🔔',
-      title: '通知精準分流',
-      desc: '指派任務時自動產生雙份通知：管理者看「誰被指派」，執行人員看「我有新任務」',
-      diff: '一般通知系統廣播給所有人',
-      color: '#fff7ed', border: '#fed7aa', titleColor: '#c2410c',
-    },
-    {
-      icon: '🎯',
-      title: '雙角色完全分流介面',
-      desc: '管理者與執行人員擁有完全不同的側邊欄、Dashboard、操作權限',
-      diff: '多數工具僅做權限遮蔽，未重組介面',
-      color: '#f0fdf4', border: '#bbf7d0', titleColor: '#15803d',
-    },
-    {
-      icon: '🔗',
-      title: '任務依賴鏈阻擋',
-      desc: '前置任務未完成時，任務頁顯示阻擋警告與依賴清單',
-      diff: 'Jira 有但設定複雜；本系統自動偵測並提示',
-      color: '#f8fafc', border: '#cbd5e1', titleColor: '#475569',
-    },
-  ];
-
-  return `
-    <div style="border:2px solid #6366f1;border-radius:16px;overflow:hidden">
-      <button onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'grid':'none';this.querySelector('.chevron').style.transform=this.querySelector('.chevron').style.transform==='rotate(180deg)'?'':'rotate(180deg)'"
-        style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:linear-gradient(90deg,#4f46e5,#7c3aed);border:none;cursor:pointer">
-        <div style="display:flex;align-items:center;gap:10px">
-          <span style="font-size:18px">✨</span>
-          <span style="color:white;font-weight:700;font-size:15px">系統特色亮點</span>
-          <span style="background:rgba(255,255,255,0.25);color:white;font-size:11px;padding:2px 8px;border-radius:99px;font-weight:600">與市場主流工具的差異化功能</span>
-        </div>
-        <svg class="chevron" style="color:white;transition:transform 0.2s;transform:rotate(180deg)" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:16px;background:white">
-        ${features.map(f => `
-          <div style="background:${f.color};border:1.5px solid ${f.border};border-radius:12px;padding:14px 16px">
-            <div style="display:flex;align-items:center;gap-8px;margin-bottom:6px">
-              <span style="font-size:22px">${f.icon}</span>
-              <span style="font-weight:700;color:${f.titleColor};font-size:14px;margin-left:8px">${f.title}</span>
-            </div>
-            <p style="font-size:12px;color:#374151;line-height:1.6;margin-bottom:6px">${f.desc}</p>
-            <div style="display:flex;align-items:flex-start;gap:4px">
-              <span style="font-size:10px;background:white;border:1px solid ${f.border};color:#6b7280;padding:2px 7px;border-radius:99px;line-height:1.6;flex-shrink:0">vs 市場</span>
-              <span style="font-size:11px;color:#6b7280;line-height:1.5">${f.diff}</span>
-            </div>
-          </div>`).join('')}
-      </div>
     </div>`;
 }
 
