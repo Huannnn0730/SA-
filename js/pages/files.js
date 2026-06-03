@@ -218,13 +218,10 @@ function previewFile(id) {
   if (!f || !f.dataUrl) { showToast('無法預覽此檔案', 'error'); return; }
 
   const isImage = ['image'].includes(f.icon);
-  const isPdf   = f.icon === 'pdf';
 
   let content;
   if (isImage) {
     content = `<img src="${f.dataUrl}" style="max-width:100%;max-height:60vh;border-radius:8px;margin:auto;display:block" />`;
-  } else if (isPdf) {
-    content = `<iframe src="${f.dataUrl}" style="width:100%;height:60vh;border:none;border-radius:8px"></iframe>`;
   } else {
     content = `
       <div class="flex flex-col items-center gap-4 py-8 text-center">
