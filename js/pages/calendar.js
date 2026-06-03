@@ -55,29 +55,57 @@ function renderCalendar() {
 
 // ── Helpers ────────────────────────────────────────────────
 
-function getMyCalendarEvents() {
-  const u = AppState.currentUser;
-  const tasks = u.role === 'admin' ? AppState.tasks : AppState.tasks.filter(t => t.assignee === u.id);
-  const events = {};
-  tasks.forEach(t => {
-    if (!t.dueDate || t.dueDate === '—') return;
-    const key = t.dueDate.replace(/\//g, '-');
-    if (!events[key]) events[key] = [];
-    events[key].push(t);
-  });
-  return events;
-}
-
 function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-function taskChip(t) {
-  const colorMap = { done:'#22c55e', active:'#3b82f6', paused:'#f59e0b', pending:'#94a3b8' };
-  const color = colorMap[t.status] || '#94a3b8';
-  return `<div onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')"
-    style="background:${color};color:white;border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px"
-    title="${t.name}">${t.name}</div>`;
+function getTasksForDate(dateStr) {
+  const u = AppState.currentUser;
+  const tasks = u.role === 'admin' ? AppState.tasks : AppState.tasks.filter(t => t.assignee === u.id);
+  return tasks.filter(t => {
+    if (!t.startDate || !t.dueDate) return false;
+    const start = t.startDate.replace(/\//g, '-');
+    const end   = t.dueDate.replace(/\//g, '-');
+    return start <= dateStr && dateStr <= end;
+  });
+}
+
+const CAL_STATUS_COLOR = {
+  done:    { bg: '#dcfce7', text: '#16a34a', border: '#16a34a' },
+  active:  { bg: '#dbeafe', text: '#1d4ed8', border: '#2563eb' },
+  paused:  { bg: '#fef3c7', text: '#b45309', border: '#d97706' },
+  pending: { bg: '#f1f5f9', text: '#64748b', border: '#94a3b8' },
+  overdue: { bg: '#fee2e2', text: '#dc2626', border: '#ef4444' },
+};
+
+// 在月視圖中，取得任務在這一天的視覺型態
+// viewFirstKey: 當月第一天 (YYYY-MM-01)
+function taskSpanType(t, dateStr, viewFirstKey) {
+  const start = t.startDate.replace(/\//g, '-');
+  const end   = t.dueDate.replace(/\//g, '-');
+  if (start === end) return 'single';
+  // 視覺起點：任務真實起點 或 當月第一天（跨月任務）
+  const visStart = start < viewFirstKey ? viewFirstKey : start;
+  if (dateStr === visStart) return 'start';
+  if (dateStr === end)      return 'end';
+  return 'mid';
+}
+
+function taskChipMonth(t, spanType) {
+  const c = CAL_STATUS_COLOR[t.status] || CAL_STATUS_COLOR.pending;
+  const radius = spanType === 'single' ? '6px'
+    : spanType === 'start' ? '6px 0 0 6px'
+    : spanType === 'end'   ? '0 6px 6px 0'
+    : '0';
+  const ml = spanType === 'mid' || spanType === 'end' ? '-1px' : '0';
+  const showText = spanType === 'start' || spanType === 'single';
+  return `<div onclick="event.stopPropagation();AppState.currentTaskId=${t.id};navigateTo('task-detail')"
+    title="${t.name}"
+    style="background:${c.bg};color:${c.text};border-left:${showText?`3px solid ${c.border}`:'none'};
+           border-radius:${radius};margin-left:${ml};padding:2px ${showText?'6px':'2px'};
+           font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+           margin-bottom:2px;line-height:1.5;"
+  >${showText ? t.name : '&nbsp;'}</div>`;
 }
 
 // ── Month View ─────────────────────────────────────────────
@@ -87,53 +115,92 @@ function renderMonthView() {
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const today = new Date();
   const isCurrentMonth = today.getFullYear() === calYear && today.getMonth() === calMonth;
-  const myEvents = getMyCalendarEvents();
+
+  const MAX_VISIBLE = 2;
+  const viewFirstKey = `${calYear}-${String(calMonth+1).padStart(2,'0')}-01`;
 
   let cells = '';
+  // 上個月補白
   for (let i = 0; i < firstDay; i++) {
-    cells += `<div class="calendar-day text-gray-200 cursor-default">${new Date(calYear, calMonth, -firstDay + i + 1).getDate()}</div>`;
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    const key = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const hasEvent = !!myEvents[key];
-    const isToday = isCurrentMonth && d === today.getDate();
-    cells += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}" onclick="showCalDayEvents('${key}', ${d})">${d}</div>`;
+    const prevDate = new Date(calYear, calMonth, -firstDay + i + 1).getDate();
+    cells += `<div style="min-height:90px;padding:6px 4px;background:#fafafa;border:1px solid #f1f5f9;border-radius:8px">
+      <div style="font-size:13px;font-weight:600;color:#d1d5db;margin-bottom:4px">${prevDate}</div>
+    </div>`;
   }
 
-  const allEvents = Object.entries(myEvents).filter(([k]) => {
-    const [y, m] = k.split('-').map(Number);
-    return y === calYear && m === calMonth + 1;
-  });
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = isCurrentMonth && d === today.getDate();
+    const isWeekend = (firstDay + d - 1) % 7 === 0 || (firstDay + d - 1) % 7 === 6;
+    const dayTasks = getTasksForDate(key);
+    const visible = dayTasks.slice(0, MAX_VISIBLE);
+    const extra = dayTasks.length - MAX_VISIBLE;
+
+    const chipsHtml = visible.map(t => taskChipMonth(t, taskSpanType(t, key, viewFirstKey))).join('') +
+      (extra > 0 ? `<div onclick="event.stopPropagation();showCalDayPanel('${key}',${d})"
+        style="font-size:11px;color:#6366f1;font-weight:600;cursor:pointer;padding:1px 6px;border-radius:4px;background:#eef2ff">
+        +${extra} 更多</div>` : '');
+
+    cells += `
+      <div onclick="showCalDayPanel('${key}',${d})"
+        style="min-height:90px;padding:6px 4px;
+               background:${isToday ? '#eff6ff' : '#fff'};
+               border:${isToday ? '2px solid #3b82f6' : '1px solid #f1f5f9'};
+               border-radius:8px;cursor:pointer;transition:background .15s;"
+        onmouseover="this.style.background='${isToday?'#dbeafe':'#f8fafc'}'"
+        onmouseout="this.style.background='${isToday?'#eff6ff':'#fff'}'">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px;
+                    color:${isToday?'#2563eb':isWeekend?'#ef4444':'#374151'};
+                    display:flex;align-items:center;gap:4px;">
+          ${isToday
+            ? `<span style="background:#3b82f6;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px">${d}</span>`
+            : d}
+        </div>
+        <div style="overflow:hidden">${chipsHtml}</div>
+      </div>`;
+  }
 
   return `
     <div class="grid grid-cols-7 mb-2">
-      ${['日','一','二','三','四','五','六'].map(d => `<div class="text-center text-xs font-semibold text-gray-400 py-2">${d}</div>`).join('')}
+      ${['日','一','二','三','四','五','六'].map((label, i) =>
+        `<div style="text-align:center;font-size:12px;font-weight:600;padding:6px 0;color:${i===0||i===6?'#ef4444':'#94a3b8'}">${label}</div>`
+      ).join('')}
     </div>
-    <div id="cal-grid" class="grid grid-cols-7 gap-1">${cells}</div>
-    <div id="cal-events" class="mt-4 pt-4 border-t border-gray-100">
-      <h4 class="font-semibold text-gray-700 text-sm mb-3">本月任務事件</h4>
-      ${allEvents.length ? allEvents.sort(([a],[b])=>a.localeCompare(b)).map(([date, tasks]) => `
-        <div class="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg">
-          <div style="width:32px;height:32px;background:#dbeafe;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#2563eb;font-size:12px;font-weight:700;flex-shrink:0">${date.split('-')[2]}</div>
-          <div class="flex flex-col gap-1 flex-1">${tasks.map(t => taskChip(t)).join('')}</div>
-        </div>`).join('') : `<div class="text-gray-400 text-sm">本月無排定事件</div>`}
-    </div>`;
+    <div class="grid grid-cols-7 gap-1">${cells}</div>
+    <div id="cal-day-panel"></div>`;
 }
 
-function showCalDayEvents(key, day) {
-  const myEvents = getMyCalendarEvents();
-  const tasks = myEvents[key];
-  const evEl = document.getElementById('cal-events');
-  if (!evEl) return;
-  if (!tasks) { evEl.innerHTML = `<div class="text-gray-400 text-sm">${calMonth+1}/${day} 無任務</div>`; return; }
-  evEl.innerHTML = `
-    <h4 class="font-semibold text-gray-700 text-sm mb-3">${calMonth+1}/${day} 任務事件</h4>
-    ${tasks.map(t => `
-      <div class="flex items-center gap-2 p-2 bg-blue-50 rounded-lg mb-2 cursor-pointer hover:bg-blue-100"
-           onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')">
-        ${svgIcon('check_circle', 16)}
-        <span class="text-sm text-gray-700">${t.name}</span>
-      </div>`).join('')}`;
+function showCalDayPanel(key, day) {
+  const tasks = getTasksForDate(key);
+  const panel = document.getElementById('cal-day-panel');
+  if (!panel) return;
+  if (!tasks.length) {
+    panel.innerHTML = `<div class="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-400">${calMonth+1}/${day} 無進行中任務</div>`;
+    return;
+  }
+  panel.innerHTML = `
+    <div class="mt-4 pt-4 border-t border-gray-100">
+      <h4 class="font-semibold text-gray-700 text-sm mb-3">${calMonth+1}/${day} 進行中任務（${tasks.length} 件）</h4>
+      <div class="flex flex-col gap-2">
+        ${tasks.map(t => {
+          const c = CAL_STATUS_COLOR[t.status] || CAL_STATUS_COLOR.pending;
+          const proj = AppState.projects.find(p => p.id === t.projectId);
+          return `
+            <div onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')"
+              style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;
+                     background:${c.bg};border-left:4px solid ${c.border};cursor:pointer;transition:opacity .15s"
+              onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+              <div style="flex:1">
+                <div style="font-size:13px;font-weight:600;color:#1e293b">${t.name}</div>
+                <div style="font-size:11px;color:#64748b;margin-top:2px">${proj ? proj.name : ''} · ${t.startDate} ～ ${t.dueDate}</div>
+              </div>
+              <span style="font-size:11px;font-weight:600;color:${c.text};background:#fff;border-radius:20px;padding:2px 8px;border:1px solid ${c.border}">
+                ${t.status === 'done' ? '已完成' : t.status === 'active' ? '進行中' : t.status === 'paused' ? '暫停中' : '未開始'}
+              </span>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`;
 }
 
 // ── Week View ──────────────────────────────────────────────

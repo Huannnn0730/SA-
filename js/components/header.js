@@ -32,7 +32,6 @@ function renderHeader() {
         <button id="hamburger-btn" class="btn-icon md:hidden">
           ${svgIcon('menu', 22)}
         </button>
-        <h1 class="text-lg font-bold text-gray-800">${title}</h1>
       </div>
       <div class="flex items-center gap-3">
         <span class="text-sm text-gray-400 hidden sm:block">${dateStr}</span>

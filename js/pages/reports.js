@@ -9,7 +9,7 @@ function renderReports() {
     <div class="page-enter">
       <div class="flex items-center justify-between mb-4">
         <h2 class="font-bold text-gray-800 text-lg">專案報表</h2>
-        <button onclick="showToast('報表已匯出','success')" class="btn btn-primary">${svgIcon('download', 16)} 匯出</button>
+        <button onclick="exportReportCSV()" class="btn btn-primary">${svgIcon('download', 16)} 匯出</button>
       </div>
 
       <!-- Tab switcher -->
@@ -300,4 +300,59 @@ function renderHeatmapTab() {
         </div>
       </div>
     </div>`;
+}
+
+function exportReportCSV() {
+  const { tasks, projects, users } = AppState;
+  const today = new Date().toISOString().split('T')[0];
+
+  // --- Sheet 1: 任務清單 ---
+  const taskHeaders = ['任務名稱', '所屬專案', '負責人', '狀態', '優先級', '開始日期', '截止日期'];
+  const statusMap = { todo: '未開始', 'in-progress': '進行中', done: '已完成', paused: '暫停中', overdue: '逾期' };
+  const priorityMap = { high: '高', medium: '中', low: '低' };
+  const taskRows = tasks.map(t => {
+    const proj = projects.find(p => p.id === t.projectId);
+    const user = users.find(u => u.id === t.assigneeId);
+    return [
+      `"${t.title}"`,
+      `"${proj ? proj.name : ''}"`,
+      `"${user ? user.name : ''}"`,
+      statusMap[t.status] || t.status,
+      priorityMap[t.priority] || t.priority,
+      t.startDate || '',
+      t.dueDate || ''
+    ].join(',');
+  });
+
+  // --- Sheet 2: 成員負載 ---
+  const memberHeaders = ['成員', '進行中任務數', '已完成任務數', '總任務數'];
+  const memberRows = users.filter(u => u.role !== 'admin').map(u => {
+    const myTasks = tasks.filter(t => t.assigneeId === u.id);
+    const inProgress = myTasks.filter(t => t.status === 'in-progress').length;
+    const done = myTasks.filter(t => t.status === 'done').length;
+    return [`"${u.name}"`, inProgress, done, myTasks.length].join(',');
+  });
+
+  // --- 組合 CSV ---
+  const lines = [
+    `專案報表匯出日期：${today}`,
+    '',
+    '【任務清單】',
+    taskHeaders.join(','),
+    ...taskRows,
+    '',
+    '【成員任務負載】',
+    memberHeaders.join(','),
+    ...memberRows
+  ];
+
+  const bom = '﻿'; // UTF-8 BOM for Excel
+  const blob = new Blob([bom + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `專案報表_${today}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('報表已匯出為 CSV', 'success');
 }
