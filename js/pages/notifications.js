@@ -95,7 +95,8 @@ function filterNotifs(btn, type) {
   if (!list) return;
   list.querySelectorAll('.notif-item').forEach(item => {
     const id = parseInt(item.id.replace('notif-', ''));
-    const n = AppState.notifications.find(n => n.id === id);
+    const n = getVisibleNotifications().find(n => n.id === id);
+    if (!n) { item.style.display = 'none'; return; }
     item.style.display = (type === 'all' || n.type === type) ? 'flex' : 'none';
   });
 }

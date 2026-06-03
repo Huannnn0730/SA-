@@ -82,7 +82,7 @@ function addMember() {
   const password = document.getElementById('mb-password').value;
   if (!name || !email || !password) { showToast('請填寫所有必填欄位', 'error'); return; }
   if (AppState.users.find(u => u.email === email)) { showToast('此 Email 已存在', 'error'); return; }
-  const id = AppState.users.length + 1;
+  const id = Math.max(0, ...AppState.users.map(u => u.id)) + 1;
   AppState.users.push({ id, name, email, password, role, title, phone: '', avatar: name.slice(0,2) });
   AppState.members.push({ id, name, title, role });
   closeModal();

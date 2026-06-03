@@ -37,9 +37,10 @@ const AppState = {
   ],
 
   notifications: [
-    { id: 1, type: 'risk',     icon: 'alert', title: '🟡 中風險任務警示（自動偵測）', message: '任務「後端 API 開發」距截止僅剩 2 天，進度僅 20%，負責人：後端工程師A', time: '剛剛',   read: false, taskId: 3, riskTaskId: 3 },
-    { id: 2, type: 'reminder', icon: 'clock', title: '任務截止提醒',                  message: '「後端 API 開發」距截止剩 2 天，目前進度僅 20%，請與後端工程師A 確認進度！', time: '1小時前', read: false, taskId: 3 },
-    { id: 3, type: 'general',  icon: 'info',  title: '進度更新',                      message: '前端工程師A 已將「前端介面開發」進度更新至 45%',                          time: '3小時前', read: false, taskId: 2 },
+    { id: 1, type: 'risk',     icon: 'alert', title: '🟡 中風險任務警示（自動偵測）', message: '任務「後端 API 開發」距截止僅剩 2 天，進度僅 20%，負責人：後端工程師A', time: '剛剛',   read: false, taskId: 3, riskTaskId: 3, targetUserId: 1 },
+    { id: 11, type: 'risk',    icon: 'alert', title: '🟡 中風險任務警示',              message: '您的任務「後端 API 開發」距截止僅剩 2 天，進度僅 20%，請盡快更新進度或聯繫管理者。', time: '剛剛', read: false, taskId: 3, riskTaskId: 3, targetUserId: 4 },
+    { id: 2, type: 'reminder', icon: 'clock', title: '任務截止提醒',                  message: '「後端 API 開發」距截止剩 2 天，目前進度僅 20%，請與後端工程師A 確認進度！', time: '1小時前', read: false, taskId: 3, targetUserId: 1 },
+    { id: 3, type: 'general',  icon: 'info',  title: '進度更新',                      message: '前端工程師A 已將「前端介面開發」進度更新至 45%',                          time: '3小時前', read: false, taskId: 2, targetUserId: 1 },
     { id: 4, type: 'task',     icon: 'bell',  title: '任務指派',                      message: '任務「整合測試」已指派給 測試工程師A，截止日期 2026/07/15',               time: '1天前',   read: true,  taskId: 4, targetUserId: 1 },
     { id: 41, type: 'task',    icon: 'bell',  title: '您有新任務被指派',               message: '「整合測試」已指派給您，截止日期 2026/07/15，請前往任務詳情確認。',        time: '1天前',   read: true,  taskId: 4, targetUserId: 5 },
     { id: 5, type: 'reminder', icon: 'clock', title: '專案截止提醒',                  message: '專案「行銷活動專案」將於 2026/06/30 截止，請確認各項任務進度',             time: '2天前',   read: true,  projectId: 2 },
