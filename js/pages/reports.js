@@ -277,7 +277,7 @@ function renderHeatmapTab() {
 
       <div class="mt-4 pt-4 border-t border-gray-100">
         <h4 class="text-sm font-semibold text-gray-700 mb-3">成員負載摘要</h4>
-        <div class="grid grid-cols-1 md:grid-cols-${Math.min(members.length, 3)} gap-3">
+        <div class="grid gap-3" style="grid-template-columns:repeat(${Math.min(members.length, 3)},minmax(0,1fr))">
           ${members.map(m => {
             const loads = days.map(d => getLoad(m.id, d));
             const avg = loads.reduce((a,b)=>a+b,0) / loads.length;

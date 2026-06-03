@@ -103,16 +103,30 @@ function renderProfileTabContent(u) {
               <div class="text-xs text-gray-400 mt-0.5">${desc}</div>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" class="sr-only peer" id="notif-${key}" checked />
+              <input type="checkbox" class="sr-only peer" id="notif-${key}" ${(AppState.currentUser?.notifSettings?.[key] !== false) ? 'checked' : ''} />
               <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
             </label>
           </div>`).join('')}
         <div class="flex justify-end">
-          <button onclick="showToast('通知設定已儲存','success')" class="btn btn-primary">儲存設定</button>
+          <button onclick="saveNotifSettings()" class="btn btn-primary">儲存設定</button>
         </div>
       </div>`;
   }
   return '';
+}
+
+function saveNotifSettings() {
+  const u = AppState.currentUser;
+  if (!u) return;
+  if (!u.notifSettings) u.notifSettings = {};
+  ['task_assigned', 'task_due', 'task_update', 'project_update', 'system'].forEach(key => {
+    const el = document.getElementById(`notif-${key}`);
+    if (el) u.notifSettings[key] = el.checked;
+  });
+  const m = AppState.members.find(m => m.id === u.id);
+  if (m) m.notifSettings = u.notifSettings;
+  saveAppState();
+  showToast('通知設定已儲存', 'success');
 }
 
 function saveProfile() {

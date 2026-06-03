@@ -224,11 +224,6 @@ function selectMood(taskId, emoji) {
   t.mood = (t.mood === emoji) ? null : emoji; // toggle
   const moodObj = MOOD_OPTIONS.find(m => m.emoji === emoji);
 
-  // Re-render mood card area only
-  const moodSection = document.getElementById('mood-btns')?.closest('.card');
-  if (moodSection) moodSection.outerHTML = renderMoodCard(t).match(/<div class="card">([\s\S]*)<\/div>/)?.[0] || '';
-
-  // Update mood display in header badges
   renderTaskDetail();
 
   // Push notification to admin if stressed
