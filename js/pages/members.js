@@ -26,12 +26,10 @@ function renderMembers() {
 function renderMemberRows() {
   return AppState.members.map(m => {
     const user = AppState.getUser(m.id);
-    const colors = ['#2563eb','#7c3aed','#db2777','#059669','#d97706','#0891b2'];
-    const color = colors[m.id % colors.length];
     return `<tr>
       <td>
         <div class="flex items-center gap-3">
-          <div style="width:36px;height:36px;border-radius:50%;background:${color};color:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">${user ? user.avatar : m.name.slice(0,2)}</div>
+          ${user ? userAvatar(user, 36) : avatarHtml(m.name.slice(0,2), 36)}
           <span class="font-medium">${m.name}</span>
         </div>
       </td>
@@ -39,7 +37,7 @@ function renderMemberRows() {
       <td><span class="badge ${m.role === 'admin' ? 'badge-blue' : 'badge-green'}">${AppState.roleLabel(m.role)}</span></td>
       <td>
         <div class="flex items-center gap-2">
-          <span class="font-semibold text-blue-600">${AppState.tasks.filter(t => t.assignee === m.id && t.status !== 'done').length}</span>
+          <span class="font-semibold text-blue-600">${(AppState.tasks || []).filter(t => t.assignee === m.id && t.status !== 'done').length}</span>
           <span class="text-gray-400 text-sm">個任務</span>
         </div>
       </td>

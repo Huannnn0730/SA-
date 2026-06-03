@@ -6,15 +6,12 @@ let profileTab = 'basic';
 
 function renderProfile() {
   const u = AppState.currentUser;
-  const colors = ['#2563eb','#7c3aed','#db2777','#059669','#d97706','#0891b2'];
-  const color = colors[u.id % colors.length];
-
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter">
       <div class="card">
         <!-- Profile header -->
         <div class="flex items-center gap-6 mb-8 pb-6 border-b border-gray-100">
-          <div style="width:80px;height:80px;border-radius:50%;background:${color};color:white;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;flex-shrink:0">${u.avatar || u.name.slice(0,2)}</div>
+          ${avatarHtml(u.avatar || u.name.slice(0,2), 80, avatarColors[u.id % avatarColors.length])}
           <div>
             <h2 class="text-2xl font-bold text-gray-800">${u.name}</h2>
             <p class="text-gray-500 mt-1">${u.title || '—'}</p>
