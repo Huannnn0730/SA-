@@ -308,13 +308,13 @@ function exportReportCSV() {
 
   // --- Sheet 1: 任務清單 ---
   const taskHeaders = ['任務名稱', '所屬專案', '負責人', '狀態', '優先級', '開始日期', '截止日期'];
-  const statusMap = { todo: '未開始', 'in-progress': '進行中', done: '已完成', paused: '暫停中', overdue: '逾期' };
-  const priorityMap = { high: '高', medium: '中', low: '低' };
+  const statusMap = { pending: '未開始', active: '進行中', done: '已完成', paused: '暫停中', overdue: '逾期' };
+  const priorityMap = { high: '高', mid: '中', low: '低' };
   const taskRows = tasks.map(t => {
     const proj = projects.find(p => p.id === t.projectId);
-    const user = users.find(u => u.id === t.assigneeId);
+    const user = users.find(u => u.id === t.assignee);
     return [
-      `"${t.title}"`,
+      `"${t.name}"`,
       `"${proj ? proj.name : ''}"`,
       `"${user ? user.name : ''}"`,
       statusMap[t.status] || t.status,
@@ -327,8 +327,8 @@ function exportReportCSV() {
   // --- Sheet 2: 成員負載 ---
   const memberHeaders = ['成員', '進行中任務數', '已完成任務數', '總任務數'];
   const memberRows = users.filter(u => u.role !== 'admin').map(u => {
-    const myTasks = tasks.filter(t => t.assigneeId === u.id);
-    const inProgress = myTasks.filter(t => t.status === 'in-progress').length;
+    const myTasks = tasks.filter(t => t.assignee === u.id);
+    const inProgress = myTasks.filter(t => t.status === 'active').length;
     const done = myTasks.filter(t => t.status === 'done').length;
     return [`"${u.name}"`, inProgress, done, myTasks.length].join(',');
   });
