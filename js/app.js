@@ -41,3 +41,14 @@ window.addEventListener('hashchange', () => {
     renderPage(page);
   }
 });
+
+// 跨分頁即時同步：另一個分頁存了 appState 時，這個分頁自動更新
+window.addEventListener('storage', (e) => {
+  if (e.key !== 'appState' || !AppState.currentUser) return;
+  loadAppState();
+  // 保留當前登入者（loadAppState 不覆蓋 currentUser）
+  renderSidebar();
+  updateNotifBadge();
+  // 重新 render 目前頁面，讓任務/通知即時反映
+  renderPage(AppState.currentPage);
+});
