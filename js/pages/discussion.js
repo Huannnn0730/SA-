@@ -140,10 +140,5 @@ function sendDiscMessage(taskId) {
   AppState.discussions.push({ id: Math.max(0, ...AppState.discussions.map(d => d.id)) + 1, taskId, user: u.id, message: msg, time: timeStr, read: true });
   saveAppState();
   input.value = '';
-  const chat = document.getElementById('disc-chat');
-  if (chat) {
-    const msgs = AppState.getDiscussionsByTask(taskId);
-    chat.innerHTML = renderDiscChatMessages(msgs);
-    chat.scrollTop = chat.scrollHeight;
-  }
+  renderDiscussion();
 }
