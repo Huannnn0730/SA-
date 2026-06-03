@@ -279,7 +279,7 @@ function addTaskComment(taskId) {
   const u = AppState.currentUser;
   const now = new Date();
   const timeStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  AppState.discussions.push({ id: AppState.discussions.length + 1, taskId, user: u.id, message: msg, time: timeStr, read: false });
+  AppState.discussions.push({ id: Math.max(0, ...AppState.discussions.map(d => d.id)) + 1, taskId, user: u.id, message: msg, time: timeStr, read: false });
   saveAppState();
   input.value = '';
   const chat = document.getElementById('task-chat');

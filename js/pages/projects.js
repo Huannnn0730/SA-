@@ -80,7 +80,7 @@ function addProject() {
   const status = document.getElementById('proj-status').value;
   if (!name) { showToast('請輸入專案名稱', 'error'); return; }
   AppState.projects.push({
-    id: AppState.projects.length + 1,
+    id: Math.max(0, ...AppState.projects.map(p => p.id)) + 1,
     name, status,
     startDate: start || '—', endDate: end || '—', progress: 0,
   });

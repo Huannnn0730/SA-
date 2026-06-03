@@ -260,7 +260,7 @@ function addTask() {
   const startRaw = document.getElementById('tk-start').value;
   const dueRaw = document.getElementById('tk-due').value;
   AppState.tasks.push({
-    id: AppState.tasks.length + 1,
+    id: Math.max(0, ...AppState.tasks.map(t => t.id)) + 1,
     name,
     projectId: parseInt(document.getElementById('tk-project').value),
     assignee: parseInt(document.getElementById('tk-assignee').value),
