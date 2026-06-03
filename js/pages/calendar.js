@@ -122,10 +122,10 @@ function renderMonthView() {
           const day = date.split('-')[2];
           const month = date.split('-')[1];
           return `
-            <div onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')"
+            <div data-date="${date}" onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')"
               style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1px solid #f1f5f9;
                      border-left:4px solid ${borderColor[t.status]||'#cbd5e1'};background:#fff;cursor:pointer;margin-bottom:8px;
-                     transition:box-shadow .15s;"
+                     transition:box-shadow .15s,outline .15s;"
               onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
               onmouseout="this.style.boxShadow='none'">
               <div style="width:36px;height:36px;background:#eff6ff;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
@@ -149,19 +149,18 @@ function renderMonthView() {
 }
 
 function showCalDayEvents(key, day) {
-  const myEvents = getMyCalendarEvents();
-  const tasks = myEvents[key];
-  const evEl = document.getElementById('cal-events');
-  if (!evEl) return;
-  if (!tasks) { evEl.innerHTML = `<div class="text-gray-400 text-sm">${calMonth+1}/${day} 無任務</div>`; return; }
-  evEl.innerHTML = `
-    <h4 class="font-semibold text-gray-700 text-sm mb-3">${calMonth+1}/${day} 任務事件</h4>
-    ${tasks.map(t => `
-      <div class="flex items-center gap-2 p-2 bg-blue-50 rounded-lg mb-2 cursor-pointer hover:bg-blue-100"
-           onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')">
-        ${svgIcon('check_circle', 16)}
-        <span class="text-sm text-gray-700">${t.name}</span>
-      </div>`).join('')}`;
+  // 清除舊高亮
+  document.querySelectorAll('#cal-events [data-date]').forEach(el => {
+    el.style.outline = 'none';
+    el.style.background = '#fff';
+  });
+  const cards = document.querySelectorAll(`#cal-events [data-date="${key}"]`);
+  if (!cards.length) return;
+  cards.forEach(el => {
+    el.style.outline = '2px solid #3b82f6';
+    el.style.background = '#eff6ff';
+  });
+  cards[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 // ── Week View ──────────────────────────────────────────────
