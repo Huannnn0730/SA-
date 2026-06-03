@@ -87,8 +87,8 @@ function renderTaskDetail() {
             </div>
           </div>
 
-          <!-- Mood Feedback card (only for assignee or admin) -->
-          ${(isAssignee || isAdmin) ? renderMoodCard(t) : ''}
+          <!-- Mood Feedback card -->
+          ${isAssignee ? renderMoodCard(t) : (isAdmin ? renderMoodReadOnly(t) : '')}
 
           <!-- Description card -->
           <div class="card">
@@ -197,6 +197,24 @@ function renderMoodCard(t) {
           </button>`).join('')}
       </div>
       ${t.mood ? `<p class="text-xs mt-3" style="color:#6b7280">已回饋：${t.mood} ${MOOD_OPTIONS.find(m=>m.emoji===t.mood)?.label || ''}</p>` : ''}
+    </div>`;
+}
+
+function renderMoodReadOnly(t) {
+  const moodObj = MOOD_OPTIONS.find(m => m.emoji === t.mood);
+  return `
+    <div class="card">
+      <h3 class="font-bold text-gray-800 mb-1">心情回饋 <span class="text-xs font-normal text-gray-400 ml-1">— 負責人回報狀態</span></h3>
+      ${t.mood && moodObj
+        ? `<div class="flex items-center gap-3 mt-2">
+            <span style="font-size:36px">${t.mood}</span>
+            <div>
+              <div class="text-sm font-semibold" style="color:${moodObj.color}">${moodObj.label}</div>
+              <div class="text-xs text-gray-400">負責人目前回報的工作狀態</div>
+            </div>
+          </div>`
+        : `<p class="text-sm text-gray-400 mt-2">負責人尚未回饋心情</p>`
+      }
     </div>`;
 }
 
