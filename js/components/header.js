@@ -16,7 +16,7 @@ const pageTitles = {
   'work-progress': '工作進度',
   calendar: '行事曆',
   files: '檔案管理',
-  discussion: '討論區 / 留言',
+  discussion: '討論區',
 };
 
 function renderHeader() {

@@ -65,7 +65,7 @@ function openAddMemberModal() {
         <div>
           <label class="form-label">角色</label>
           <select id="mb-role" class="form-input form-select">
-            <option value="executor">執行人員</option><option value="admin">管理者</option>
+            <option value="executor">執行人員</option><option value="admin">管理員</option>
           </select>
         </div>
       </div>
@@ -106,7 +106,7 @@ function openEditMemberModal(id) {
         <label class="form-label">角色</label>
         <select id="emb-role" class="form-input form-select">
           <option value="executor" ${m.role==='executor'?'selected':''}>執行人員</option>
-          <option value="admin" ${m.role==='admin'?'selected':''}>管理者</option>
+          <option value="admin" ${m.role==='admin'?'selected':''}>管理員</option>
         </select>
       </div>
     </div>`,

@@ -33,7 +33,7 @@ function renderProjectRows() {
   return AppState.projects.map(p => `
     <tr>
       <td class="font-medium">
-        <button onclick="openProjectDetail(${p.id})" class="text-left text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors">${p.name}</button>
+        <button onclick="openProjectDetail(${p.id})" class="text-left text-gray-800 hover:text-blue-600 hover:underline font-medium transition-colors">${p.name}</button>
       </td>
       <td><span class="badge ${AppState.statusBadge(p.status)}">${AppState.statusLabel(p.status)}</span></td>
       <td class="text-gray-500">${p.startDate}</td>

@@ -71,8 +71,8 @@ function renderDiscussion() {
               <!-- Chat header -->
               <div class="p-4 border-b border-gray-100 flex items-center gap-3">
                 <div>
-                  <div class="font-bold text-gray-800 text-sm">任務討論 — ${activeThread.task?.name || '—'}</div>
-                  <div class="text-xs text-gray-400">${activeThread.msgs.length} 則留言</div>
+                  <div class="font-bold text-gray-800 text-sm">討論區 — ${activeThread.task?.name || '—'}</div>
+                  <div class="text-xs text-gray-400">${activeThread.msgs.length} 則訊息</div>
                 </div>
                 ${activeThread.task ? `
                   <button onclick="AppState.currentTaskId=${activeThread.task.id};navigateTo('task-detail')" class="btn btn-secondary btn-sm ml-auto">查看任務</button>
@@ -119,14 +119,14 @@ function renderDiscChatMessages(msgs) {
     const sender = AppState.getUser(m.user);
     const isMe = m.user === u.id;
     return `
-      <div class="flex ${isMe ? 'flex-row-reverse' : 'flex-row'} items-end gap-2">
-        ${!isMe ? (sender ? userAvatar(sender, 32) : '') : ''}
+      <div class="flex ${isMe ? 'flex-row-reverse' : 'flex-row'} items-start gap-2">
+        ${!isMe ? (sender ? userAvatar(sender, 32) : '<div style="width:32px;flex-shrink:0"></div>') : ''}
         <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} gap-1">
           ${!isMe ? `<span class="text-xs text-gray-400 ml-1">${sender?.name || '—'}</span>` : ''}
           <div class="chat-bubble ${isMe ? 'chat-bubble-right' : 'chat-bubble-left'}">${m.message}</div>
           <span class="text-xs text-gray-300 mx-1">${m.time}</span>
         </div>
-        ${isMe ? (sender ? userAvatar(sender, 32) : '') : ''}
+        ${isMe ? (sender ? userAvatar(sender, 32) : '<div style="width:32px;flex-shrink:0"></div>') : ''}
       </div>`;
   }).join('');
 }

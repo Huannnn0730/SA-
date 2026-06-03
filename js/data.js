@@ -53,13 +53,7 @@ const AppState = {
     { id: 5, name: '測試工程師A', title: '測試工程師', role: 'executor' },
   ],
 
-  files: [
-    { id: 1, name: '系統架構圖.png',  projectId: 1, size: '0.5 MB', date: '2026/05/10', icon: 'image' },
-    { id: 2, name: '需求流程.drawio', projectId: 1, size: '2.1 MB', date: '2026/05/20', icon: 'drawio' },
-    { id: 3, name: 'API 文件.pdf',    projectId: 1, size: '1.3 MB', date: '2026/05/18', icon: 'pdf' },
-    { id: 4, name: 'UI設計稿.zip',    projectId: 2, size: '8.4 MB', date: '2026/05/12', icon: 'zip' },
-    { id: 5, name: '測試報告.xlsx',   projectId: 3, size: '0.9 MB', date: '2026/05/15', icon: 'xlsx' },
-  ],
+  files: [],
 
   discussions: [
     { id: 1, taskId: 1, user: 1, message: '需求文件已上傳到 Google Drive，請大家確認', time: '2026/05/10 10:30', read: false },
@@ -136,5 +130,5 @@ const AppState = {
   },
   priorityLabel(p) { return { high: '高', mid: '中', low: '低' }[p] || p; },
   priorityBadge(p) { return { high: 'badge-red', mid: 'badge-orange', low: 'badge-green' }[p] || 'badge-gray'; },
-  roleLabel(r) { return { admin: '管理者', executor: '執行人員' }[r] || r; },
+  roleLabel(r) { return { admin: '管理員', executor: '執行人員' }[r] || r; },
 };

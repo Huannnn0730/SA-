@@ -46,7 +46,7 @@ function renderRegister() {
             <label class="flex-1 flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-blue-300 transition-colors" id="role-admin-label">
               <input type="radio" name="role" value="admin" id="role-admin" class="accent-blue-600" />
               <div>
-                <div class="font-semibold text-sm text-gray-800">管理人員</div>
+                <div class="font-semibold text-sm text-gray-800">管理員</div>
                 <div class="text-xs text-gray-400">可管理專案、任務與成員</div>
               </div>
             </label>
