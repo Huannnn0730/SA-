@@ -101,8 +101,9 @@ body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; }
 .calendar-day { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.15s; position: relative; }
 .calendar-day:hover { background: #eff6ff; }
 .calendar-day.today { background: #2563eb; color: white; font-weight: 700; }
-.calendar-day.has-event::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: #f97316; }
-.calendar-day.today.has-event::after { background: white; }
+.calendar-day.has-event { background: #dbeafe; color: #1d4ed8; font-weight: 600; }
+.calendar-day.has-event:hover { background: #bfdbfe; }
+.calendar-day.today { background: #2563eb; color: white; font-weight: 700; }
 
 /* Notification item */
 .notif-item { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; cursor: pointer; }

@@ -140,7 +140,7 @@ function renderMonthView() {
                 <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${badgeColor[t.status]||badgeColor.pending}">
                   ${statusMap[t.status]||t.status}
                 </span>
-                ${assigneeUser ? `<div title="${assigneeUser.name}" style="width:26px;height:26px;border-radius:50%;background:#6366f1;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${assigneeUser.avatar}</div>` : ''}
+                ${assigneeUser ? userAvatar(assigneeUser, 26) : ''}
               </div>
             </div>`;
         }).join('')
