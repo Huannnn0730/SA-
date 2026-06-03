@@ -3,11 +3,7 @@
 // ============================================================
 
 function renderNotifications() {
-  const u = AppState.currentUser;
-  const myTaskIds = new Set(AppState.tasks.filter(t => t.assignee === u.id).map(t => t.id));
-  const notifs = u.role === 'admin'
-    ? AppState.notifications
-    : AppState.notifications.filter(n => n.taskId && myTaskIds.has(n.taskId));
+  const notifs = getVisibleNotifications();
   const unread = notifs.filter(n => !n.read).length;
 
   const iconMap = { bell: 'bell', clock: 'clock', info: 'info', settings: 'settings' };
@@ -64,7 +60,7 @@ function renderNotifications() {
 }
 
 function markAllRead() {
-  AppState.notifications.forEach(n => n.read = true);
+  getVisibleNotifications().forEach(n => n.read = true);
   saveAppState();
   renderNotifications();
   updateNotifBadge();

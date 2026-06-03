@@ -284,8 +284,8 @@ function addTask() {
   const assigneeUser = AppState.users.find(u => u.id === assigneeId);
   if (assigneeUser) {
     const newTask = AppState.tasks[AppState.tasks.length - 1];
-    const now = new Date();
-    const timeStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const adminUser = AppState.users.find(u => u.role === 'admin');
+    // 管理者看到的：「誰被指派了什麼」
     AppState.notifications.unshift({
       id: Date.now(),
       type: 'task',
@@ -296,7 +296,23 @@ function addTask() {
       read: false,
       taskId: newTask.id,
       assigneeId: assigneeId,
+      targetUserId: adminUser ? adminUser.id : null,
     });
+    // 被指派人員看到的：「你有新任務」（排除指派給自己的情況）
+    if (assigneeUser.role !== 'admin') {
+      AppState.notifications.unshift({
+        id: Date.now() + 1,
+        type: 'task',
+        icon: 'bell',
+        title: '您有新任務被指派',
+        message: `「${name}」已指派給您，截止日期 ${newTask.dueDate}，請前往任務詳情確認。`,
+        time: '剛剛',
+        read: false,
+        taskId: newTask.id,
+        assigneeId: assigneeId,
+        targetUserId: assigneeId,
+      });
+    }
     updateNotifBadge();
   }
 

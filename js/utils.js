@@ -2,6 +2,18 @@
 // UTILITIES
 // ============================================================
 
+// 依目前登入者過濾可見通知
+// admin：看所有無 targetUserId 的通知 + targetUserId === admin.id 的通知
+// 執行人員：只看 targetUserId === 自己 id 的通知
+function getVisibleNotifications() {
+  const u = AppState.currentUser;
+  if (!u) return [];
+  if (u.role === 'admin') {
+    return AppState.notifications.filter(n => !n.targetUserId || n.targetUserId === u.id);
+  }
+  return AppState.notifications.filter(n => n.targetUserId === u.id);
+}
+
 function showToast(message, type = 'success') {
   const container = document.getElementById('toast-container');
   const toast = document.createElement('div');
@@ -183,7 +195,7 @@ function saveAppState() {
   } catch(e) {}
 }
 
-const NOTIF_VERSION = 2;
+const NOTIF_VERSION = 3;
 
 function loadAppState() {
   try {

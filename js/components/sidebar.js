@@ -108,7 +108,7 @@ function updateSidebarActive() {
 function updateNotifBadge() {
   const badge = document.getElementById('notif-badge');
   if (!badge) return;
-  const unread = AppState.notifications.filter(n => !n.read).length;
+  const unread = getVisibleNotifications().filter(n => !n.read).length;
   badge.textContent = unread > 0 ? unread : '';
   badge.style.display = unread > 0 ? 'inline-flex' : 'none';
 }
