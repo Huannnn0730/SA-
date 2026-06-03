@@ -112,11 +112,39 @@ function renderMonthView() {
     <div id="cal-grid" class="grid grid-cols-7 gap-1">${cells}</div>
     <div id="cal-events" class="mt-4 pt-4 border-t border-gray-100">
       <h4 class="font-semibold text-gray-700 text-sm mb-3">本月任務事件</h4>
-      ${allEvents.length ? allEvents.sort(([a],[b])=>a.localeCompare(b)).map(([date, tasks]) => `
-        <div class="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-lg">
-          <div style="width:32px;height:32px;background:#dbeafe;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#2563eb;font-size:12px;font-weight:700;flex-shrink:0">${date.split('-')[2]}</div>
-          <div class="flex flex-col gap-1 flex-1">${tasks.map(t => taskChip(t)).join('')}</div>
-        </div>`).join('') : `<div class="text-gray-400 text-sm">本月無排定事件</div>`}
+      ${allEvents.length ? allEvents.sort(([a],[b])=>a.localeCompare(b)).map(([date, tasks]) =>
+        tasks.map(t => {
+          const statusMap = { done:'已完成', active:'進行中', paused:'暫停中', pending:'未開始', overdue:'逾期' };
+          const badgeColor = { done:'#dcfce7;color:#16a34a', active:'#dbeafe;color:#1d4ed8', paused:'#fef3c7;color:#b45309', pending:'#f1f5f9;color:#64748b', overdue:'#fee2e2;color:#dc2626' };
+          const borderColor = { done:'#16a34a', active:'#3b82f6', paused:'#f59e0b', pending:'#cbd5e1', overdue:'#ef4444' };
+          const assigneeUser = AppState.users.find(u => u.id === t.assignee);
+          const proj = AppState.projects.find(p => p.id === t.projectId);
+          const day = date.split('-')[2];
+          const month = date.split('-')[1];
+          return `
+            <div onclick="AppState.currentTaskId=${t.id};navigateTo('task-detail')"
+              style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;border:1px solid #f1f5f9;
+                     border-left:4px solid ${borderColor[t.status]||'#cbd5e1'};background:#fff;cursor:pointer;margin-bottom:8px;
+                     transition:box-shadow .15s;"
+              onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'"
+              onmouseout="this.style.boxShadow='none'">
+              <div style="width:36px;height:36px;background:#eff6ff;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0">
+                <span style="font-size:10px;color:#93c5fd;font-weight:600;line-height:1">${month}月</span>
+                <span style="font-size:15px;color:#2563eb;font-weight:700;line-height:1.2">${day}</span>
+              </div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:2px">${proj ? proj.name : ''}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${badgeColor[t.status]||badgeColor.pending}">
+                  ${statusMap[t.status]||t.status}
+                </span>
+                ${assigneeUser ? `<div title="${assigneeUser.name}" style="width:26px;height:26px;border-radius:50%;background:#6366f1;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${assigneeUser.avatar}</div>` : ''}
+              </div>
+            </div>`;
+        }).join('')
+      ).join('') : `<div class="text-gray-400 text-sm">本月無排定事件</div>`}
     </div>`;
 }
 
