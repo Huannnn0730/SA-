@@ -126,7 +126,6 @@ function renderDiscChatMessages(msgs) {
           <div class="chat-bubble ${isMe ? 'chat-bubble-right' : 'chat-bubble-left'}">${m.message}</div>
           <span class="text-xs text-gray-300 mx-1">${m.time}</span>
         </div>
-        ${isMe ? (sender ? userAvatar(sender, 32) : '<div style="width:32px;flex-shrink:0"></div>') : ''}
       </div>`;
   }).join('');
 }
