@@ -4,51 +4,18 @@
 
 var calYear  = new Date().getFullYear();
 var calMonth = new Date().getMonth();
-var calView  = 'month'; // 'month' | 'week' | 'day'
-var calWeekStart = (() => { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate() - d.getDay()); return d; })();
-var calDay   = new Date(); // selected day for day view
 
 function renderCalendar() {
-  const viewBtns = ['month','week','day'].map((v, i) => {
-    const labels = ['月','週','日'];
-    const active = calView === v;
-    return `<button onclick="calView='${v}';renderCalendar()"
-      class="btn btn-sm ${active ? 'btn-primary' : 'btn-secondary'}"
-      style="padding:4px 12px;font-size:12px">${labels[i]}</button>`;
-  }).join('');
-
-  let navHtml = '', contentHtml = '';
-
-  if (calView === 'month') {
-    navHtml = `
-      <button onclick="calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();" class="btn-icon">${svgIcon('arrow_left', 18)}</button>
-      <h3 class="font-bold text-gray-800 text-lg">${calYear} 年 ${calMonth + 1} 月</h3>
-      <button onclick="calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();" class="btn-icon">${svgIcon('arrow_right', 18)}</button>`;
-    contentHtml = renderMonthView();
-  } else if (calView === 'week') {
-    const weekEnd = new Date(calWeekStart); weekEnd.setDate(calWeekStart.getDate() + 6);
-    navHtml = `
-      <button onclick="calWeekStart=new Date(calWeekStart);calWeekStart.setDate(calWeekStart.getDate()-7);renderCalendar();" class="btn-icon">${svgIcon('arrow_left', 18)}</button>
-      <h3 class="font-bold text-gray-800 text-lg">${calWeekStart.getMonth()+1}/${calWeekStart.getDate()} — ${weekEnd.getMonth()+1}/${weekEnd.getDate()}</h3>
-      <button onclick="calWeekStart=new Date(calWeekStart);calWeekStart.setDate(calWeekStart.getDate()+7);renderCalendar();" class="btn-icon">${svgIcon('arrow_right', 18)}</button>`;
-    contentHtml = renderWeekView();
-  } else {
-    navHtml = `
-      <button onclick="calDay=new Date(calDay);calDay.setDate(calDay.getDate()-1);renderCalendar();" class="btn-icon">${svgIcon('arrow_left', 18)}</button>
-      <h3 class="font-bold text-gray-800 text-lg">${calDay.getFullYear()} 年 ${calDay.getMonth()+1} 月 ${calDay.getDate()} 日</h3>
-      <button onclick="calDay=new Date(calDay);calDay.setDate(calDay.getDate()+1);renderCalendar();" class="btn-icon">${svgIcon('arrow_right', 18)}</button>`;
-    contentHtml = renderDayView();
-  }
+  const navHtml = `
+    <button onclick="calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();" class="btn-icon">${svgIcon('arrow_left', 18)}</button>
+    <h3 class="font-bold text-gray-800 text-lg">${calYear} 年 ${calMonth + 1} 月</h3>
+    <button onclick="calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();" class="btn-icon">${svgIcon('arrow_right', 18)}</button>`;
 
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter">
       <div class="card">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="font-bold text-gray-800 text-lg">行事曆</h2>
-          <div class="flex gap-1 bg-gray-100 rounded-lg p-1">${viewBtns}</div>
-        </div>
         <div class="flex items-center justify-between mb-4">${navHtml}</div>
-        ${contentHtml}
+        ${renderMonthView()}
       </div>
     </div>`;
 }
@@ -134,7 +101,7 @@ function renderMonthView() {
               </div>
               <div style="flex:1;min-width:0">
                 <div style="font-size:13px;font-weight:600;color:#1e293b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${t.name}</div>
-                <div style="font-size:11px;color:#94a3b8;margin-top:2px">${proj ? proj.name : ''}</div>
+                <div style="font-size:11px;color:#94a3b8;margin-top:2px">${proj ? proj.name : ''} ${t.startDate ? `· ${t.startDate} ～ ${t.dueDate}` : ''}</div>
               </div>
               <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
                 <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:${badgeColor[t.status]||badgeColor.pending}">
