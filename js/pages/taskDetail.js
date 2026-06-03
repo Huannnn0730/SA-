@@ -247,7 +247,6 @@ function renderTaskChatMessages(discussions) {
           <div class="chat-bubble ${isMe ? 'chat-bubble-right' : 'chat-bubble-left'}">${d.message}</div>
           <span class="text-xs text-gray-300">${d.time}</span>
         </div>
-        ${isMe ? (sender ? userAvatar(sender, 32) : '') : ''}
       </div>`;
   }).join('');
 }
