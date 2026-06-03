@@ -234,6 +234,7 @@ function selectMood(taskId, emoji) {
   // Push notification to admin if stressed
   if (t.mood === '😤' || t.mood === '😟') {
     const assignee = AppState.getUser(t.assignee);
+    const adminUser = AppState.users.find(u => u.role === 'admin');
     AppState.notifications.unshift({
       id: Date.now(),
       type: 'mood',
@@ -242,6 +243,8 @@ function selectMood(taskId, emoji) {
       message: `${assignee ? assignee.name : '成員'} 在任務「${t.name}」回饋心情：${t.mood}，請適時關懷`,
       time: '剛剛',
       read: false,
+      taskId: t.id,
+      targetUserId: adminUser ? adminUser.id : null,
     });
   }
 
@@ -306,9 +309,59 @@ function updateTaskStatus(taskId, newStatus) {
   if (newStatus === 'done') t.progress = 100;
   if (newStatus === 'active' && t.progress === 0) t.progress = 5;
   checkRiskAlerts();
+
+  // 通知管理者狀態變更
+  const adminUser = AppState.users.find(u => u.role === 'admin');
+  const executor = AppState.getUser(t.assignee);
+  if (adminUser && AppState.currentUser?.id !== adminUser.id) {
+    const statusLabel = { done: '已完成', active: '開始執行', paused: '暫停中', pending: '重設為待開始' };
+    AppState.notifications.unshift({
+      id: Date.now(),
+      type: 'general',
+      icon: 'info',
+      title: '任務狀態更新',
+      message: `${executor ? executor.name : '成員'} 已將「${t.name}」標記為「${statusLabel[newStatus] || newStatus}」`,
+      time: '剛剛',
+      read: false,
+      taskId: t.id,
+      targetUserId: adminUser.id,
+    });
+  }
+
   saveAppState();
   renderTaskDetail();
   showToast(newStatus === 'done' ? '任務已標記為完成！' : '任務已開始執行', 'success');
+}
+
+function saveTaskProgress(taskId) {
+  const tk = AppState.tasks.find(t => t.id === taskId);
+  if (!tk) return;
+  const newProgress = parseInt(document.getElementById('prog-slider').value);
+  const oldProgress = tk.progress;
+  tk.progress = newProgress;
+  checkRiskAlerts();
+
+  // 通知管理者進度更新
+  const adminUser = AppState.users.find(u => u.role === 'admin');
+  const executor = AppState.getUser(tk.assignee);
+  if (adminUser && AppState.currentUser?.id !== adminUser.id) {
+    AppState.notifications.unshift({
+      id: Date.now(),
+      type: 'general',
+      icon: 'info',
+      title: '進度更新',
+      message: `${executor ? executor.name : '成員'} 已將「${tk.name}」進度從 ${oldProgress}% 更新至 ${newProgress}%`,
+      time: '剛剛',
+      read: false,
+      taskId: tk.id,
+      targetUserId: adminUser.id,
+    });
+  }
+
+  saveAppState();
+  closeModal();
+  renderTaskDetail();
+  showToast('進度已更新', 'success');
 }
 
 function openProgressModal(taskId) {
@@ -321,6 +374,6 @@ function openProgressModal(taskId) {
       <div class="flex justify-between text-xs text-gray-400 mt-1"><span>0%</span><span>50%</span><span>100%</span></div>
     </div>`,
     `<button onclick="closeModal()" class="btn btn-secondary">取消</button>
-     <button onclick="(function(){var tk=AppState.tasks.find(t=>t.id===${taskId});tk.progress=parseInt(document.getElementById('prog-slider').value);checkRiskAlerts();saveAppState();closeModal();renderTaskDetail();showToast('進度已更新','success');})()" class="btn btn-primary">儲存</button>`
+     <button onclick="saveTaskProgress(${taskId})" class="btn btn-primary">儲存</button>`
   ));
 }

@@ -386,6 +386,7 @@ function openEditTaskModal(id) {
 function saveTask(id) {
   const t = AppState.tasks.find(t => t.id === id);
   if (!t) return;
+  const prevAssigneeId = t.assignee;
   t.name = document.getElementById('etk-name').value.trim() || t.name;
   t.projectId = parseInt(document.getElementById('etk-project').value);
   t.assignee = parseInt(document.getElementById('etk-assignee').value);
@@ -396,9 +397,42 @@ function saveTask(id) {
   t.progress = parseInt(document.getElementById('etk-progress').value);
   t.desc = document.getElementById('etk-desc').value;
 
-  // Save dependencies (multi-select)
   const depsEl = document.getElementById('etk-deps');
   t.dependencies = depsEl ? Array.from(depsEl.selectedOptions).map(o => parseInt(o.value)) : [];
+
+  // 負責人變更時：通知新負責人 + 通知管理者
+  if (t.assignee !== prevAssigneeId) {
+    const adminUser = AppState.users.find(u => u.role === 'admin');
+    const newAssignee = AppState.users.find(u => u.id === t.assignee);
+    const oldAssignee = AppState.users.find(u => u.id === prevAssigneeId);
+    if (newAssignee && newAssignee.role !== 'admin') {
+      AppState.notifications.unshift({
+        id: Date.now(),
+        type: 'task',
+        icon: 'bell',
+        title: '任務重新指派給您',
+        message: `「${t.name}」已重新指派給您，截止日期 ${t.dueDate}，請前往任務詳情確認。`,
+        time: '剛剛',
+        read: false,
+        taskId: t.id,
+        targetUserId: t.assignee,
+      });
+    }
+    if (adminUser) {
+      AppState.notifications.unshift({
+        id: Date.now() + 1,
+        type: 'task',
+        icon: 'bell',
+        title: '任務負責人變更',
+        message: `「${t.name}」已從 ${oldAssignee ? oldAssignee.name : '—'} 重新指派給 ${newAssignee ? newAssignee.name : '—'}`,
+        time: '剛剛',
+        read: false,
+        taskId: t.id,
+        targetUserId: adminUser.id,
+      });
+    }
+    updateNotifBadge();
+  }
 
   closeModal();
   refreshTaskView();
