@@ -217,20 +217,40 @@ function loadAppState() {
 
 function checkRiskAlerts() {
   const risks = getRiskTasks();
+  const adminUser = AppState.users.find(u => u.role === 'admin');
   risks.forEach(t => {
-    const exists = AppState.notifications.some(n => n.riskTaskId === t.id);
-    if (!exists) {
-      const assignee = AppState.getUser(t.assignee);
+    const existsAdmin = AppState.notifications.some(n => n.riskTaskId === t.id && (!n.targetUserId || n.targetUserId === adminUser?.id));
+    const existsAssignee = AppState.notifications.some(n => n.riskTaskId === t.id && n.targetUserId === t.assignee);
+    const assignee = AppState.getUser(t.assignee);
+    const label = t.riskLevel === 'high' ? '🔴 高風險' : '🟡 中風險';
+
+    if (!existsAdmin) {
       AppState.notifications.unshift({
         id: Date.now() + t.id,
         type: 'risk',
         icon: 'alert',
-        title: t.riskLevel === 'high' ? '🔴 高風險任務警示（自動偵測）' : '🟡 中風險任務警示（自動偵測）',
+        title: `${label}任務警示（自動偵測）`,
         message: `任務「${t.name}」${t.riskReason}，負責人：${assignee ? assignee.name : '—'}`,
         time: '剛剛',
         read: false,
         riskTaskId: t.id,
         taskId: t.id,
+        targetUserId: adminUser ? adminUser.id : null,
+      });
+    }
+
+    if (!existsAssignee && assignee && assignee.role !== 'admin') {
+      AppState.notifications.unshift({
+        id: Date.now() + t.id + 500,
+        type: 'risk',
+        icon: 'alert',
+        title: `${label}任務警示`,
+        message: `您的任務「${t.name}」${t.riskReason}，請盡快更新進度或聯繫管理者。`,
+        time: '剛剛',
+        read: false,
+        riskTaskId: t.id,
+        taskId: t.id,
+        targetUserId: t.assignee,
       });
     }
   });
