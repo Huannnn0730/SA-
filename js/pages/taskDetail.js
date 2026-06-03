@@ -97,19 +97,13 @@ function renderTaskDetail() {
           </div>
 
           <!-- Attachments card -->
-          <div class="card">
+          <div class="card" id="task-attachments-card">
             <div class="flex items-center justify-between mb-3">
               <h3 class="font-bold text-gray-800">附件</h3>
-              <button onclick="showToast('請選擇要上傳的檔案','info')" class="btn btn-secondary btn-sm">${svgIcon('upload', 14)} 上傳</button>
+              <button onclick="document.getElementById('task-file-input-${t.id}').click()" class="btn btn-secondary btn-sm">${svgIcon('upload', 14)} 上傳</button>
+              <input type="file" id="task-file-input-${t.id}" style="display:none" multiple onchange="uploadTaskFile(${t.id},this)" />
             </div>
-            ${t.attachments && t.attachments.length > 0
-              ? t.attachments.map(a => `
-                  <div class="file-item">
-                    <div style="width:36px;height:36px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3b82f6">${svgIcon('file', 16)}</div>
-                    <span class="text-sm text-gray-700">${a}</span>
-                    <button onclick="showToast('下載中...','info')" class="btn-icon ml-auto">${svgIcon('download', 14)}</button>
-                  </div>`).join('')
-              : `<div class="text-center text-gray-400 text-sm py-4">暫無附件</div>`}
+            ${renderTaskAttachments(t.id)}
           </div>
 
           <!-- Discussion card -->
@@ -265,6 +259,54 @@ function renderTaskChatMessages(discussions) {
         </div>
       </div>`;
   }).join('');
+}
+
+function renderTaskAttachments(taskId) {
+  const files = AppState.files.filter(f => f.taskId === taskId);
+  if (!files.length) return `<div class="text-center text-gray-400 text-sm py-4">暫無附件</div>`;
+  return files.map(f => `
+    <div class="file-item">
+      <div style="width:36px;height:36px;background:#f1f5f9;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3b82f6">${svgIcon('file', 16)}</div>
+      <div class="flex-1 min-w-0">
+        <div class="text-sm text-gray-700 truncate">${f.name}</div>
+        <div class="text-xs text-gray-400">${f.size} · ${f.date}</div>
+      </div>
+      ${f.dataUrl ? `<button onclick="downloadFile(${f.id})" class="btn-icon ml-auto">${svgIcon('download', 14)}</button>` : ''}
+    </div>`).join('');
+}
+
+function uploadTaskFile(taskId, input) {
+  const task = AppState.tasks.find(t => t.id === taskId);
+  if (!task || !input.files.length) return;
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}`;
+  const maxId = AppState.files.reduce((m, f) => Math.max(m, f.id), 0);
+  const fileArr = Array.from(input.files);
+  let processed = 0;
+  showToast('上傳中...', 'info');
+  fileArr.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      AppState.files.push({
+        id: maxId + i + 1,
+        name: file.name,
+        projectId: task.projectId,
+        taskId: taskId,
+        size: `${(file.size / 1024 / 1024).toFixed(1)} MB`,
+        date: dateStr,
+        icon: getFileIcon(file.name),
+        dataUrl: e.target.result,
+      });
+      processed++;
+      if (processed === fileArr.length) {
+        saveAppState();
+        renderTaskDetail();
+        showToast(`已上傳 ${fileArr.length} 個檔案`, 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
 }
 
 function addTaskComment(taskId) {
