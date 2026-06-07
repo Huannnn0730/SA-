@@ -4,9 +4,21 @@
 
 let selectedProjectId = 'all'; // 'all' | projectId number
 
+function getMyProjectIds() {
+  const u = AppState.currentUser;
+  if (!u || u.role === 'admin') return null; // null = all
+  return [...new Set(AppState.tasks.filter(t => t.assignee === u.id).map(t => t.projectId))];
+}
+
 function renderFiles() {
-  const projects = AppState.projects;
-  const allCount = AppState.files.length;
+  const myProjectIds = getMyProjectIds();
+  const projects = myProjectIds
+    ? AppState.projects.filter(p => myProjectIds.includes(p.id))
+    : AppState.projects;
+  const myFiles = myProjectIds
+    ? AppState.files.filter(f => myProjectIds.includes(f.projectId))
+    : AppState.files;
+  const allCount = myFiles.length;
 
   document.getElementById('page-container').innerHTML = `
     <div class="page-enter">
@@ -29,7 +41,7 @@ function renderFiles() {
               <div onclick="selectedProjectId=${p.id};renderFiles()" class="file-item ${selectedProjectId===p.id ? 'bg-blue-50 text-blue-600' : 'text-gray-600'}">
                 ${svgIcon('folder', 18)}
                 <span class="text-sm font-medium truncate">${p.name}</span>
-                <span class="ml-auto text-xs text-gray-400 flex-shrink-0">${AppState.files.filter(f => f.projectId === p.id).length}</span>
+                <span class="ml-auto text-xs text-gray-400 flex-shrink-0">${myFiles.filter(f => f.projectId === p.id).length}</span>
               </div>`).join('')}
           </div>
 
@@ -84,9 +96,13 @@ function getFileIcon(name) {
 }
 
 function getFilteredFiles() {
+  const myProjectIds = getMyProjectIds();
+  const base = myProjectIds
+    ? AppState.files.filter(f => myProjectIds.includes(f.projectId))
+    : AppState.files;
   return selectedProjectId === 'all'
-    ? AppState.files
-    : AppState.files.filter(f => f.projectId === selectedProjectId);
+    ? base
+    : base.filter(f => f.projectId === selectedProjectId);
 }
 
 function renderFileRows(files) {
